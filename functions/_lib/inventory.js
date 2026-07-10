@@ -53,8 +53,8 @@ export const DEFAULT_INVENTORY = [
     name: "Motorola CM200 Mobile Radio — VHF 146-174 MHz (6 Available)",
     condition: "Used",
     category: "radios",
-    price: 145,
-    description: `Fleet-retired Motorola Radius CM200 VHF analog mobile radios removed from Prince George Transport ambulances. Six (6) units available — $825 if you take all six ($137.50/ea).
+    price: 165,
+    description: `Fleet-retired Motorola Radius CM200 VHF analog mobile radios removed from Prince George Transport ambulances. Six (6) units available — $930 if you take all six ($155/ea).
 
 SPECS (per Motorola CM200):
 • VHF 146–174 MHz
@@ -74,14 +74,13 @@ CONDITION (well used):
 • Programming is for prior fleet channels; reprogramming required for your system
 • Requires Motorola CPS and compatible programming cable (RIBless) for PC programming
 
-INCLUDED WITH EACH RADIO:
+COMPLETE KIT INCLUDED WITH EACH RADIO:
 • Motorola CM200 mobile radio (VHF)
 • Hand microphone
 • Vehicle wire harness (power/speaker/mic — as removed from ambulance)
+• Dash/vehicle mounting bracket
 
-Mounting brackets sold separately if needed — ask when you inquire.
-
-Ideal for volunteer fire/EMS, training programs, spare mobiles, or budget fleet backup. Local pickup in Blythewood, SC preferred. Will ship within continental US at buyer's expense.`,
+Ready to install after programming. Ideal for volunteer fire/EMS, training programs, spare mobiles, or budget fleet backup. Local pickup in Blythewood, SC preferred. Will ship within continental US at buyer's expense.`,
     imageUrl: "",
   },
   {
