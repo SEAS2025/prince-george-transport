@@ -1,0 +1,22 @@
+name = "prince-george-transport"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "public"
+
+[vars]
+SITE_URL = "https://prince-george-transport.pages.dev"
+SITE_NAME = "Prince George Transport"
+PHONE = "(803) 231-9420"
+ADDRESS = "200 Louthian Way, Blythewood, SC 29016"
+YELP_URL = "https://www.yelp.com/biz/prince-george-transport-blythewood"
+EMAIL_FROM = "Prince George Transport <onboarding@resend.dev>"
+EMAIL_REPLY_TO = "info@princegeorgetransport.com"
+
+# Secrets (set via: wrangler pages secret put NAME --project-name=prince-george-transport)
+#   ADMIN_PIN              - PIN code for /admin.html inventory management
+#   ADMIN_SIGNING_SECRET   - Optional; signs admin session cookies (defaults to ADMIN_PIN)
+#   RESEND_API_KEY         - Resend API key for inquiry emails
+#   OWNER_EMAIL            - Where inquiry notifications are sent
+
+[[kv_namespaces]]
+binding = "INVENTORY"
+id = "aa59fb7be32c407eb217c75faa134b95"

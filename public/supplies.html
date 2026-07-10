@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Used Ambulance Supplies &amp; Radios for Sale | Prince George Transport</title>
+  <meta name="description" content="Buy used ambulance equipment, EMS supplies, and two-way radios from Prince George Transport in Blythewood, SC. Stretchers, oxygen gear, AEDs, Motorola radios and more.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="logo">
+        <img src="/img/logo.svg" alt="Prince George Transport logo" width="48" height="48">
+        <div>
+          <div class="logo-text">Prince George Transport</div>
+          <div class="logo-sub">Used EMS Equipment</div>
+        </div>
+      </a>
+      <nav class="nav">
+        <a href="/">Home</a>
+        <a href="/#services">Transport</a>
+        <a href="#inventory">Inventory</a>
+        <a href="#inquire">Inquire</a>
+      </nav>
+      <div class="header-actions">
+        <a href="tel:8032319420" class="header-phone">(803) 231-9420</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero" style="padding:3rem 0 4rem">
+    <div class="container">
+      <p class="hero-tag">Fleet-retired · Inspected · Ready to ship</p>
+      <h1>Used ambulance supplies &amp; two-way radios</h1>
+      <p>Quality EMS equipment retired from our active fleet. Stretchers, oxygen systems, monitoring gear, and Motorola/Kenwood radios — priced for volunteer departments, training programs, and budget-conscious agencies.</p>
+      <div class="hero-actions">
+        <a href="#inventory" class="btn btn-primary">View Inventory</a>
+        <a href="tel:8032319420" class="btn btn-secondary">Call to Buy</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="inventory">
+    <div class="container">
+      <h2 class="section-title">Current Inventory</h2>
+      <p class="section-sub">All items are used, tested, and sold as-is. Prices negotiable for bulk orders. Click "Inquire to Buy" on any item.</p>
+      <div id="products-grid" class="card-grid card-grid-3"></div>
+    </div>
+  </section>
+
+  <section class="section" style="background:white">
+    <div class="container">
+      <div class="card-grid card-grid-2">
+        <div class="card">
+          <h3 style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:0.5rem">Ambulance Supplies</h3>
+          <p style="font-family:var(--font-ui);font-size:0.875rem;color:var(--muted)">We regularly list used stretchers, stair chairs, backboards, splints, oxygen regulators, suction units, AEDs, first-aid kits, and mounting hardware. Inventory changes as we rotate fleet equipment — call for the latest availability.</p>
+        </div>
+        <div class="card">
+          <h3 style="font-family:var(--font-display);font-size:1.4rem;margin-bottom:0.5rem">Two-Way Radios</h3>
+          <p style="font-family:var(--font-ui);font-size:0.875rem;color:var(--muted)">Motorola XPR and CP series portables, Kenwood TK and NX models, mobile units, chargers, and spare batteries. Programmed for public safety bands where applicable — reprogramming available on request.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="inquire">
+    <div class="container">
+      <h2 class="section-title">Inquire to Buy</h2>
+      <p class="section-sub">Tell us what you need — we'll confirm availability and pricing</p>
+      <div class="contact-grid">
+        <div>
+          <p style="font-family:var(--font-ui);font-size:0.9rem;color:var(--muted);margin-bottom:1rem">Prefer to talk? Call <a href="tel:8032319420"><strong>(803) 231-9420</strong></a> or visit us at 200 Louthian Way, Blythewood, SC 29016.</p>
+          <div class="card" style="background:var(--ice);border:none">
+            <p style="font-family:var(--font-ui);font-size:0.85rem"><strong>Buying tips:</strong></p>
+            <ul style="font-family:var(--font-ui);font-size:0.85rem;color:var(--muted);margin:0.5rem 0 0 1.25rem;line-height:1.8">
+              <li>Local pickup available — no shipping on stretchers</li>
+              <li>Radios sold with charger; batteries extra</li>
+              <li>Bulk discounts for departments buying 5+ items</li>
+              <li>All sales final — items sold as-is</li>
+            </ul>
+          </div>
+        </div>
+        <form id="inquiry-form" class="card">
+          <div class="form-group">
+            <label for="name">Your Name</label>
+            <input type="text" id="name" name="name" required>
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" required>
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone</label>
+            <input type="tel" id="phone" name="phone">
+          </div>
+          <div class="form-group">
+            <label for="inquiry-item">Item of Interest</label>
+            <select id="inquiry-item" name="item">
+              <option value="">Select an item…</option>
+              <option value="Other / General Inquiry">Other / General Inquiry</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" placeholder="Quantity needed, shipping address, or questions…"></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Submit Inquiry</button>
+          <div id="form-msg" class="form-msg" role="status"></div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <h4>Prince George Transport</h4>
+        <p>Used ambulance supplies and two-way radios from a licensed SC ambulance provider.</p>
+      </div>
+      <div>
+        <h4>Links</h4>
+        <p><a href="/">Home</a><br><a href="tel:8032319420">(803) 231-9420</a><br><a href="https://www.yelp.com/biz/prince-george-transport-blythewood" target="_blank" rel="noopener">Yelp</a></p>
+      </div>
+      <div>
+        <h4>Pickup</h4>
+        <p>200 Louthian Way<br>Blythewood, SC 29016</p>
+      </div>
+    </div>
+    <div class="container footer-bottom">© 2026 Prince George Transport</div>
+  </footer>
+
+  <script src="/js/site-config.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

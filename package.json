@@ -1,0 +1,13 @@
+{
+  "name": "prince-george-transport",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Prince George Transport — non-emergency medical transport & used EMS equipment",
+  "scripts": {
+    "dev": "wrangler pages dev public --compatibility-date=2024-01-01",
+    "deploy": "wrangler pages deploy public --project-name=prince-george-transport"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

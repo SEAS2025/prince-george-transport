@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Prince George Transport">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b1f3a"/>
+      <stop offset="100%" stop-color="#163a6b"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" rx="24" fill="url(#bg)"/>
+  <!-- Star of Life -->
+  <g transform="translate(100,88)" fill="none" stroke="#e8f0fa" stroke-width="5" stroke-linecap="round">
+    <line x1="0" y1="-42" x2="0" y2="42"/>
+    <line x1="-36.4" y1="-21" x2="36.4" y2="21"/>
+    <line x1="-36.4" y1="21" x2="36.4" y2="-21"/>
+    <line x1="-42" y1="0" x2="42" y2="0"/>
+    <line x1="-21" y1="-36.4" x2="21" y2="36.4"/>
+    <line x1="21" y1="-36.4" x2="-21" y2="36.4"/>
+  </g>
+  <circle cx="100" cy="88" r="52" fill="none" stroke="#c41e3a" stroke-width="4"/>
+  <!-- PG monogram -->
+  <text x="100" y="168" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="34" font-weight="900" fill="#ffffff" letter-spacing="2">PGT</text>
+</svg>

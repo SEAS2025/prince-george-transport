@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventory Admin | Prince George Transport</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="logo">
+        <img src="/img/logo.svg" alt="" width="48" height="48">
+        <div>
+          <div class="logo-text">PGT Admin</div>
+          <div class="logo-sub">Inventory Manager</div>
+        </div>
+      </a>
+      <div class="header-actions">
+        <a href="/supplies.html">View Store</a>
+        <button type="button" id="logout-btn" class="btn btn-secondary" hidden>Log Out</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container admin-wrap">
+
+      <section data-panel="login" class="card admin-login-card">
+        <h1 class="section-title" style="text-align:left;margin-bottom:0.25rem">Enter PIN</h1>
+        <p class="admin-muted" style="margin-bottom:1.25rem">Authorized staff only. Manage used supplies and radio inventory.</p>
+        <form id="pin-form">
+          <div class="form-group">
+            <label for="pin">Admin PIN</label>
+            <input type="password" id="pin" name="pin" inputmode="numeric" autocomplete="one-time-code" required placeholder="••••">
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Unlock</button>
+          <div id="login-msg" class="form-msg" role="status"></div>
+        </form>
+      </section>
+
+      <section data-panel="dashboard" hidden>
+        <div class="admin-tabs">
+          <button type="button" class="admin-tab active" data-tab="inventory">Inventory</button>
+          <button type="button" class="admin-tab" data-tab="marketing">Marketing</button>
+        </div>
+
+        <div data-tab-panel="inventory">
+        <div class="admin-header">
+          <div>
+            <h1 class="section-title" style="text-align:left;margin-bottom:0.25rem">Inventory</h1>
+            <p class="admin-muted">Add, edit, or remove items. Changes appear on the supplies page immediately.</p>
+          </div>
+        </div>
+
+        <div class="admin-layout">
+          <div class="card">
+            <h2 style="font-family:var(--font-display);font-size:1.35rem;margin-bottom:1rem">Current Listings</h2>
+            <div id="item-list"></div>
+          </div>
+
+          <div class="card">
+            <h2 id="form-title" style="font-family:var(--font-display);font-size:1.35rem;margin-bottom:1rem">Add Item</h2>
+            <form id="item-form">
+              <div class="form-group">
+                <label for="name">Item Name *</label>
+                <input type="text" id="name" name="name" required placeholder="Motorola XPR 7550e Portable Radio">
+              </div>
+              <div class="form-group">
+                <label for="condition">Condition</label>
+                <select id="condition" name="condition">
+                  <option value="Used">Used</option>
+                  <option value="Refurbished">Refurbished</option>
+                  <option value="New">New</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="category">Category</label>
+                <select id="category" name="category">
+                  <option value="supplies">Ambulance Supplies</option>
+                  <option value="radios">Two-Way Radios</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="price">Price (USD)</label>
+                <input type="number" id="price" name="price" min="0" step="1" placeholder="Leave blank for 'Call for price'">
+              </div>
+              <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" placeholder="Condition notes, what's included, pickup/shipping info…"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="imageUrl">Photo URL (optional)</label>
+                <input type="url" id="imageUrl" name="imageUrl" placeholder="https://…">
+              </div>
+              <div class="admin-form-actions">
+                <button type="submit" id="save-btn" class="btn btn-primary">Add to Inventory</button>
+                <button type="button" id="cancel-edit" class="btn btn-outline" hidden>Cancel Edit</button>
+              </div>
+              <div id="save-msg" class="form-msg" role="status"></div>
+            </form>
+          </div>
+        </div>
+        </div>
+
+        <div data-tab-panel="marketing" hidden>
+          <div class="admin-header">
+            <div>
+              <h1 class="section-title" style="text-align:left;margin-bottom:0.25rem">Marketing</h1>
+              <p class="admin-muted">Export listings for Facebook Marketplace and reach EMT training programs.</p>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:1.25rem;border-color:#1877f2">
+            <h2 style="font-family:var(--font-display);font-size:1.35rem;margin-bottom:0.5rem">Facebook Marketplace</h2>
+            <p id="fb-note" class="admin-muted" style="margin-bottom:1rem"></p>
+            <div class="admin-form-actions">
+              <a href="/api/admin/marketplace-export" class="btn btn-primary" id="csv-download">Download CSV for Bulk Lister</a>
+              <button type="button" class="btn btn-outline" id="copy-all-fb">Copy All Listing Text</button>
+            </div>
+            <p class="admin-muted" style="margin-top:0.75rem;font-size:0.8rem">Use CSV with Chrome extensions like AutoList or TheLazyPoster. Post 10–15 listings/hour to avoid Facebook restrictions.</p>
+            <div id="fb-posts" class="admin-fb-list"></div>
+          </div>
+
+          <div class="card">
+            <h2 style="font-family:var(--font-display);font-size:1.35rem;margin-bottom:0.5rem">EMT School Leads (SC)</h2>
+            <p class="admin-muted" style="margin-bottom:1rem">Public contacts for programs that may buy expired training equipment. Click to copy outreach email.</p>
+            <div id="emt-leads"></div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script src="/js/admin.js"></script>
+</body>
+</html>
