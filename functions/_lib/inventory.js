@@ -50,15 +50,15 @@ export const DEFAULT_INVENTORY = [
   },
   {
     id: "radio-cm200",
-    name: "Motorola CM200 Mobile Radio — UHF 438-470 MHz (6 Available)",
+    name: "Motorola CM200 Mobile Radio — VHF 146-174 MHz (6 Available)",
     condition: "Used",
     category: "radios",
-    price: 125,
-    description: `Fleet-retired Motorola Radius CM200 analog mobile radios removed from Prince George Transport ambulances. Six (6) units available — $695 if you take all six ($115.67/ea).
+    price: 145,
+    description: `Fleet-retired Motorola Radius CM200 VHF analog mobile radios removed from Prince George Transport ambulances. Six (6) units available — $825 if you take all six ($137.50/ea).
 
 SPECS (per Motorola CM200):
-• UHF 438–470 MHz (verify band/programming before purchase)
-• 4 channels · 25W high / 1–25W low power
+• VHF 146–174 MHz
+• 4 channels · 45W high / 1–25W low power
 • 12.5 / 25 kHz channel spacing (narrowband capable)
 • 42 standard CTCSS + 84 DCS privacy codes
 • MDC-1200 & Quik Call II signaling
@@ -74,7 +74,12 @@ CONDITION (well used):
 • Programming is for prior fleet channels; reprogramming required for your system
 • Requires Motorola CPS and compatible programming cable (RIBless) for PC programming
 
-INCLUDED: Radio unit only unless otherwise agreed. Microphones, mounting brackets, and power cables available separately — ask when you inquire.
+INCLUDED WITH EACH RADIO:
+• Motorola CM200 mobile radio (VHF)
+• Hand microphone
+• Vehicle wire harness (power/speaker/mic — as removed from ambulance)
+
+Mounting brackets sold separately if needed — ask when you inquire.
 
 Ideal for volunteer fire/EMS, training programs, spare mobiles, or budget fleet backup. Local pickup in Blythewood, SC preferred. Will ship within continental US at buyer's expense.`,
     imageUrl: "",
