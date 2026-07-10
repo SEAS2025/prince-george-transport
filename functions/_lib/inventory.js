@@ -49,12 +49,34 @@ export const DEFAULT_INVENTORY = [
     imageUrl: "",
   },
   {
-    id: "radio-moto-1",
-    name: "Motorola XPR 7550e Portable Radio",
+    id: "radio-cm200",
+    name: "Motorola CM200 Mobile Radio — UHF 438-470 MHz (6 Available)",
     condition: "Used",
     category: "radios",
-    price: 275,
-    description: "UHF portable with antenna and belt clip. Charger included. Programmed — reprogramming available.",
+    price: 125,
+    description: `Fleet-retired Motorola Radius CM200 analog mobile radios removed from Prince George Transport ambulances. Six (6) units available — $695 if you take all six ($115.67/ea).
+
+SPECS (per Motorola CM200):
+• UHF 438–470 MHz (verify band/programming before purchase)
+• 4 channels · 25W high / 1–25W low power
+• 12.5 / 25 kHz channel spacing (narrowband capable)
+• 42 standard CTCSS + 84 DCS privacy codes
+• MDC-1200 & Quik Call II signaling
+• Front-facing 4W internal speaker · 8-character display
+• 2 programmable buttons · busy channel lockout · time-out timer
+• IP54 splash-resistant · 2.25 lb radio body
+• Dimensions: 6.67 × 4.64 × 1.73 in (169 × 118 × 44 mm)
+
+CONDITION (well used):
+• Heavy fleet use — scuffs, scratches, and dash-mount wear typical of ambulance service
+• Removed from working vehicles; sold as-is
+• Radios power on and were in service at time of removal — no bench certification included
+• Programming is for prior fleet channels; reprogramming required for your system
+• Requires Motorola CPS and compatible programming cable (RIBless) for PC programming
+
+INCLUDED: Radio unit only unless otherwise agreed. Microphones, mounting brackets, and power cables available separately — ask when you inquire.
+
+Ideal for volunteer fire/EMS, training programs, spare mobiles, or budget fleet backup. Local pickup in Blythewood, SC preferred. Will ship within continental US at buyer's expense.`,
     imageUrl: "",
   },
   {
