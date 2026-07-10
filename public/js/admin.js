@@ -41,6 +41,11 @@ const PGT_ADMIN = {
       tab.addEventListener("click", () => this.switchTab(tab.dataset.tab));
     });
     document.getElementById("copy-all-fb")?.addEventListener("click", () => this.copyAllFacebook());
+    document.getElementById("ebay-connect")?.addEventListener("click", () => this.connectEbay());
+    document.getElementById("ebay-publish-all")?.addEventListener("click", () => this.publishAllEbay());
+    document.getElementById("ebay-disconnect")?.addEventListener("click", () => this.disconnectEbay());
+
+    this.handleEbayRedirect();
 
     try {
       const { authed } = await this.fetchJson("/api/admin/session");
@@ -48,6 +53,7 @@ const PGT_ADMIN = {
         this.show("dashboard");
         await this.loadItems();
         await this.loadMarketing();
+        await this.loadEbay();
       } else {
         this.show("login");
       }
@@ -115,6 +121,7 @@ const PGT_ADMIN = {
         </div>
         <div class="admin-item-actions">
           <button type="button" class="btn btn-outline btn-sm" data-edit="${item.id}">Edit</button>
+          <button type="button" class="btn btn-dark btn-sm" data-ebay="${item.id}" title="Publish to eBay">eBay</button>
           <button type="button" class="btn btn-danger btn-sm" data-delete="${item.id}">Delete</button>
         </div>
       </div>
@@ -125,6 +132,9 @@ const PGT_ADMIN = {
     });
     list.querySelectorAll("[data-delete]").forEach((btn) => {
       btn.addEventListener("click", () => this.deleteItem(btn.dataset.delete));
+    });
+    list.querySelectorAll("[data-ebay]").forEach((btn) => {
+      btn.addEventListener("click", () => this.publishEbayItem(btn.dataset.ebay, btn));
     });
   },
 
@@ -260,6 +270,130 @@ const PGT_ADMIN = {
     } catch (e) {
       if (fbNote) fbNote.textContent = `Could not load marketing data: ${e.message}`;
     }
+  },
+
+  handleEbayRedirect() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("ebay") === "connected") {
+      this.switchTab("marketing");
+      history.replaceState({}, "", "/admin.html");
+    }
+    if (params.get("ebay") === "error") {
+      alert("eBay connection failed: " + (params.get("msg") || "unknown error"));
+      history.replaceState({}, "", "/admin.html");
+    }
+  },
+
+  async loadEbay() {
+    const statusEl = document.getElementById("ebay-status");
+    const connectBtn = document.getElementById("ebay-connect");
+    const publishBtn = document.getElementById("ebay-publish-all");
+    const disconnectBtn = document.getElementById("ebay-disconnect");
+    const resultsEl = document.getElementById("ebay-results");
+    if (!statusEl) return;
+
+    try {
+      const status = await this.fetchJson("/api/admin/ebay/status");
+      this.ebayStatus = status;
+
+      if (!status.configured) {
+        statusEl.textContent = "eBay app not configured on server. Add EBAY_CLIENT_ID, EBAY_CLIENT_SECRET, and EBAY_RUNAME secrets (see SETUP-EBAY.md).";
+        connectBtn.hidden = true;
+        publishBtn.hidden = true;
+        disconnectBtn.hidden = true;
+        return;
+      }
+
+      if (!status.connected) {
+        statusEl.textContent = "Not connected. Click below to authorize your eBay seller account.";
+        connectBtn.hidden = false;
+        publishBtn.hidden = true;
+        disconnectBtn.hidden = true;
+      } else {
+        const policyNote = status.policiesReady ? "Business policies ready." : "Will auto-fetch policies on first publish.";
+        statusEl.textContent = `Connected since ${new Date(status.connectedAt).toLocaleDateString()}. ${policyNote} Category: ${status.categoryId}.`;
+        connectBtn.hidden = true;
+        publishBtn.hidden = false;
+        disconnectBtn.hidden = false;
+      }
+
+      if (resultsEl && status.listings) {
+        const entries = Object.entries(status.listings);
+        if (entries.length) {
+          resultsEl.innerHTML = entries.map(([id, l]) => `
+            <div class="admin-fb-item">
+              <strong>${esc(id)}</strong>
+              ${l.listingUrl ? `<a href="${esc(l.listingUrl)}" target="_blank" rel="noopener">View on eBay</a>` : ""}
+              <span class="admin-item-meta">SKU ${esc(l.sku || "")} · Offer ${esc(l.offerId || "")}</span>
+            </div>
+          `).join("");
+        }
+      }
+    } catch (e) {
+      statusEl.textContent = `eBay status error: ${e.message}`;
+    }
+  },
+
+  async connectEbay() {
+    const btn = document.getElementById("ebay-connect");
+    btn.disabled = true;
+    try {
+      const { url } = await this.fetchJson("/api/admin/ebay/auth");
+      window.location.href = url;
+    } catch (e) {
+      alert(e.message);
+      btn.disabled = false;
+    }
+  },
+
+  async disconnectEbay() {
+    if (!confirm("Disconnect eBay account?")) return;
+    await this.fetchJson("/api/admin/ebay/disconnect", { method: "POST" });
+    await this.loadEbay();
+  },
+
+  async publishAllEbay() {
+    const btn = document.getElementById("ebay-publish-all");
+    if (!confirm("Publish all inventory items to eBay? Items need a price set.")) return;
+    btn.disabled = true;
+    try {
+      const result = await this.fetchJson("/api/admin/ebay/publish", { method: "POST", body: JSON.stringify({}) });
+      this.showEbayResults(result);
+      await this.loadEbay();
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      btn.disabled = false;
+    }
+  },
+
+  async publishEbayItem(itemId, btn) {
+    const orig = btn?.textContent;
+    if (btn) { btn.disabled = true; btn.textContent = "…"; }
+    try {
+      const result = await this.fetchJson("/api/admin/ebay/publish", {
+        method: "POST",
+        body: JSON.stringify({ itemId }),
+      });
+      this.showEbayResults(result);
+      await this.loadEbay();
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = orig; }
+    }
+  },
+
+  showEbayResults(result) {
+    const el = document.getElementById("ebay-results");
+    if (!el) return;
+    el.innerHTML = (result.results || []).map((r) => `
+      <div class="admin-fb-item">
+        <strong>${esc(r.name || r.id)}</strong>
+        <span class="admin-item-meta">${r.ok ? "✓ Published" : "✗ " + esc(r.error)}</span>
+        ${r.listingUrl ? `<a href="${esc(r.listingUrl)}" target="_blank" rel="noopener">View listing</a>` : ""}
+      </div>
+    `).join("");
   },
 
   async copyAllFacebook() {

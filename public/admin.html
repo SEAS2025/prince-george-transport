@@ -115,6 +115,18 @@
             </div>
           </div>
 
+          <div class="card" style="margin-bottom:1.25rem;border-color:#e53238">
+            <h2 style="font-family:var(--font-display);font-size:1.35rem;margin-bottom:0.5rem">eBay Listings</h2>
+            <p id="ebay-status" class="admin-muted" style="margin-bottom:1rem">Checking eBay connection…</p>
+            <div class="admin-form-actions">
+              <button type="button" class="btn btn-primary" id="ebay-connect" hidden>Connect eBay Account</button>
+              <button type="button" class="btn btn-primary" id="ebay-publish-all" hidden>Publish All to eBay</button>
+              <button type="button" class="btn btn-outline" id="ebay-disconnect" hidden>Disconnect</button>
+            </div>
+            <p class="admin-muted" style="margin-top:0.75rem;font-size:0.8rem">Requires eBay Developer app + Business Policies in Seller Hub. See <code>SETUP-EBAY.md</code>.</p>
+            <div id="ebay-results" class="admin-fb-list"></div>
+          </div>
+
           <div class="card" style="margin-bottom:1.25rem;border-color:#1877f2">
             <h2 style="font-family:var(--font-display);font-size:1.35rem;margin-bottom:0.5rem">Facebook Marketplace</h2>
             <p id="fb-note" class="admin-muted" style="margin-bottom:1rem"></p>

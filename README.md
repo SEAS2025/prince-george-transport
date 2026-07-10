@@ -26,6 +26,14 @@ Set the PIN in production:
 npx wrangler pages secret put ADMIN_PIN --project-name=prince-george-transport
 ```
 
+## eBay listings
+
+See **[SETUP-EBAY.md](SETUP-EBAY.md)** for full setup. In Admin → Marketing:
+
+1. Set `EBAY_CLIENT_ID`, `EBAY_CLIENT_SECRET`, `EBAY_RUNAME` as Cloudflare secrets
+2. Connect your eBay seller account
+3. Publish inventory items to eBay (requires price + Business Policies in Seller Hub)
+
 ## Marketing (Facebook + EMT schools)
 
 In **Admin → Marketing** tab (PIN required):

@@ -1,1 +1,7 @@
 ADMIN_PIN=your-pin-here
+
+# eBay (optional — see SETUP-EBAY.md)
+# EBAY_CLIENT_ID=
+# EBAY_CLIENT_SECRET=
+# EBAY_RUNAME=
+# EBAY_ENV=production
