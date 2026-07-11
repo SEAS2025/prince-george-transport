@@ -50,37 +50,50 @@ export const DEFAULT_INVENTORY = [
   },
   {
     id: "radio-cm200",
-    name: "Motorola CM200 Mobile Radio — VHF 146-174 MHz (6 Available)",
+    name: "Motorola VHF Mobile Radios — CM200/CM300/CM200d (6 Available)",
     condition: "Used",
     category: "radios",
     price: 165,
-    description: `Fleet-retired Motorola Radius CM200 VHF analog mobile radios removed from Prince George Transport ambulances. Six (6) units available — $930 if you take all six ($155/ea).
+    description: `Fleet-retired Motorola VHF mobile radios removed from Prince George Transport ambulances. Six (6) units total — $930 for all six ($155/ea). Four units inventoried by serial number below; 2 additional units same fleet (model labels pending).
 
-SPECS (per Motorola CM200):
-• VHF 146–174 MHz
-• 4 channels · 45W high / 1–25W low power
-• 12.5 / 25 kHz channel spacing (narrowband capable)
-• 42 standard CTCSS + 84 DCS privacy codes
-• MDC-1200 & Quik Call II signaling
-• Front-facing 4W internal speaker · 8-character display
-• 2 programmable buttons · busy channel lockout · time-out timer
-• IP54 splash-resistant · 2.25 lb radio body
-• Dimensions: 6.67 × 4.64 × 1.73 in (169 × 118 × 44 mm)
+VERIFIED UNITS (4 of 6):
+
+① CM200 45W — SN 922TMU3381
+   Model: AAM50KQD9AA1AN · TANAPA PMUD1875C · FCC ABZ99FT3046
+   VHF 146–174 MHz · 4 channels · 25–45W · Control head PMLN4900C
+   Mfg estimate: ~2009–2012 (Motorola serial decode)
+
+② CM300 25W — SN 922TMC5022
+   Model: AAM50KNF9AA1AN · TANAPA PMUD1873B · FCC AZ492FT3805
+   VHF 146–174 MHz · 32 channels · 1–25W · Control head (standard CM300)
+   Note: CM300 (not CM200) — more channels, lower power
+
+③ CM200 45W — SN 922TNE0190
+   Model: AAM50KQD9AA1AN · TANAPA PMUD1875C · FCC ABZ99FT3046
+   VHF 146–174 MHz · 4 channels · 25–45W · Control head PMLN4598C
+   Mfg estimate: ~2009–2012
+
+④ CM200d 45W — SN 751TGQ0925
+   Model: AAM01JQC9JC1AN · TANAPA PMUD3237A · FCC ABZ99FT3091
+   VHF 136–174 MHz · 16 channels · 25–45W · Control head PMLN6321A
+   MOTOTRBO CM200d (analog; hardware-upgradeable to digital)
+   Mfg estimate: ~2014–2017
+
+COMMON FEATURES:
+• Analog VHF · 12.5/25 kHz narrowband capable
+• MDC-1200 & Quik Call II · busy channel lockout
+• IP54 splash-resistant · front-facing speaker
 
 CONDITION (well used):
-• Heavy fleet use — scuffs, scratches, and dash-mount wear typical of ambulance service
-• Removed from working vehicles; sold as-is
-• Radios power on and were in service at time of removal — no bench certification included
-• Programming is for prior fleet channels; reprogramming required for your system
-• Requires Motorola CPS and compatible programming cable (RIBless) for PC programming
+• Heavy ambulance fleet use — scuffs, dash-mount wear, worn labels
+• Removed from working vehicles; sold as-is, no bench certification
+• Fleet programming — reprogramming required (Motorola CPS + RIBless cable)
+• CM200d may require CM200d CPS for programming
 
-COMPLETE KIT INCLUDED WITH EACH RADIO:
-• Motorola CM200 mobile radio (VHF)
-• Hand microphone
-• Vehicle wire harness (power/speaker/mic — as removed from ambulance)
-• Dash/vehicle mounting bracket
+COMPLETE KIT PER RADIO:
+• Mobile radio + hand microphone + vehicle wire harness + mounting bracket
 
-Ready to install after programming. Ideal for volunteer fire/EMS, training programs, spare mobiles, or budget fleet backup. Local pickup in Blythewood, SC preferred. Will ship within continental US at buyer's expense.`,
+Local pickup Blythewood, SC. CONUS shipping at buyer's expense.`,
     imageUrl: "",
   },
   {
