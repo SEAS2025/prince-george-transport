@@ -5,7 +5,9 @@
   "description": "Prince George Transport — non-emergency medical transport & used EMS equipment",
   "scripts": {
     "dev": "wrangler pages dev public --compatibility-date=2024-01-01",
-    "deploy": "wrangler pages deploy public --project-name=prince-george-transport"
+    "deploy": "wrangler pages deploy public --project-name=prince-george-transport",
+    "inventory:verify": "node scripts/verify-sales-policy.mjs",
+    "inventory:apply": "bash scripts/apply-inventory.sh"
   },
   "devDependencies": {
     "wrangler": "^4.0.0"

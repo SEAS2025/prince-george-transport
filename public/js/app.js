@@ -17,27 +17,87 @@ const PGT_APP = {
     return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(amount);
   },
 
-  renderProducts(products, container) {
+  productImages(product) {
+    const images = [];
+    if (product.imageUrl) images.push(product.imageUrl);
+    for (const url of product.extraImageUrls || []) {
+      if (url && !images.includes(url)) images.push(url);
+    }
+    return images;
+  },
+
+  renderGallery(product) {
+    const images = this.productImages(product);
+    if (!images.length) return "";
+
+    const thumbs = images.length > 1
+      ? `<div class="product-thumbs">${images.map((url, i) => `
+          <button type="button" class="product-thumb${i === 0 ? " active" : ""}" data-src="${esc(url)}" aria-label="Photo ${i + 1}${i === 0 ? " (main)" : ""}">
+            <img src="${esc(url)}" alt="" loading="lazy">
+          </button>
+        `).join("")}</div>`
+      : "";
+
+    return `
+      <div class="product-gallery" data-gallery="${esc(product.id)}">
+        <img src="${esc(images[0])}" alt="${esc(product.name)}" class="product-img product-img-main" loading="lazy">
+        ${thumbs}
+      </div>
+    `;
+  },
+
+  bindGalleries(container) {
+    container.querySelectorAll(".product-gallery").forEach((gallery) => {
+      const main = gallery.querySelector(".product-img-main");
+      gallery.querySelectorAll(".product-thumb").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const src = btn.dataset.src;
+          if (!src || !main) return;
+          main.src = src;
+          gallery.querySelectorAll(".product-thumb").forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+        });
+      });
+    });
+  },
+
+  renderProductCard(product) {
+    const hasPhoto = this.productImages(product).length > 0;
+    const qty = product.quantity > 1 ? `<span class="product-qty">Qty ${product.quantity}</span>` : "";
+    const serial = product.serialNumber
+      ? `<p class="product-serial">SN ${esc(product.serialNumber)}</p>`
+      : "";
+
+    return `
+      <article class="card product-card${hasPhoto ? " has-photo" : ""}" id="${esc(product.id)}" data-product-id="${product.id}">
+        ${this.renderGallery(product)}
+        <span class="condition ${product.condition === "Used" ? "used" : ""}">${esc(product.condition)}</span>
+        ${qty}
+        <h3>${esc(product.name)}</h3>
+        ${serial}
+        <div class="product-price">${this.formatPrice(product.price)}</div>
+        <p class="product-desc">${esc(product.description)}</p>
+        <div class="product-actions">
+          ${product.ebayListingUrl
+            ? `<a href="${esc(product.ebayListingUrl)}" class="btn btn-ebay btn-block" target="_blank" rel="noopener noreferrer">Buy on eBay</a>`
+            : ""}
+          <button type="button" class="btn btn-dark btn-block inquiry-btn" data-item="${esc(product.name)}">
+            ${product.ebayListingUrl ? "Inquire Direct" : "Inquire to Buy"}
+          </button>
+        </div>
+      </article>
+    `;
+  },
+
+  renderProducts(products, container, emptyMessage) {
     if (!container) return;
     if (!products.length) {
-      container.innerHTML = `<p style="text-align:center;font-family:var(--font-ui);color:var(--muted);grid-column:1/-1">No items in stock right now. Call <a href="tel:8032319420">(803) 231-9420</a> for availability.</p>`;
+      container.innerHTML = `<p class="inventory-empty">${emptyMessage}</p>`;
       return;
     }
 
-    container.innerHTML = products.map((p) => `
-      <article class="card product-card" data-product-id="${p.id}">
-        ${p.imageUrl ? `<img src="${esc(p.imageUrl)}" alt="${esc(p.name)}" class="product-img" loading="lazy">` : ""}
-        <span class="condition ${p.condition === "Used" ? "used" : ""}">${esc(p.condition)}</span>
-        <h3>${esc(p.name)}</h3>
-        <div class="product-price">${this.formatPrice(p.price)}</div>
-        <p class="product-desc">${esc(p.description)}</p>
-        <button type="button" class="btn btn-dark btn-block inquiry-btn" data-item="${esc(p.name)}">
-          Inquire to Buy
-        </button>
-      </article>
-    `).join("");
-
-    this.syncInquirySelect(products);
+    container.innerHTML = products.map((p) => this.renderProductCard(p)).join("");
+    this.bindGalleries(container);
 
     container.querySelectorAll(".inquiry-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -94,16 +154,44 @@ const PGT_APP = {
   },
 
   async initSuppliesPage() {
-    const grid = document.getElementById("products-grid");
+    const vehiclesGrid = document.getElementById("vehicles-grid");
+    const radiosGrid = document.getElementById("radios-grid");
+    const suppliesGrid = document.getElementById("supplies-grid");
+    const legacyGrid = document.getElementById("products-grid");
+    const grid = legacyGrid || radiosGrid || vehiclesGrid;
+
     if (!grid) return;
 
-    grid.innerHTML = `<p style="text-align:center;font-family:var(--font-ui);color:var(--muted);grid-column:1/-1">Loading inventory…</p>`;
+    const loading = `<p style="text-align:center;font-family:var(--font-ui);color:var(--muted);grid-column:1/-1">Loading inventory…</p>`;
+    if (vehiclesGrid) vehiclesGrid.innerHTML = loading;
+    if (radiosGrid) radiosGrid.innerHTML = loading;
+    if (suppliesGrid) suppliesGrid.innerHTML = loading;
+    if (legacyGrid) legacyGrid.innerHTML = loading;
 
     try {
       const { items } = await this.fetchJson("/api/inventory");
-      this.renderProducts(items, grid);
+      const vehicles = items.filter((i) => i.category === "vehicles");
+      const radios = items.filter((i) => i.category === "radios");
+      const supplies = items.filter((i) => i.category !== "radios" && i.category !== "vehicles");
+
+      if (vehiclesGrid) {
+        this.renderProducts(vehicles, vehiclesGrid, "No vehicles listed right now. Call (803) 231-9420 for availability.");
+      }
+
+      if (radiosGrid && suppliesGrid) {
+        this.renderProducts(radios, radiosGrid, "No radios listed right now. Call (803) 231-9420 for availability.");
+        this.renderProducts(supplies, suppliesGrid, "No supplies listed right now.");
+      } else if (legacyGrid) {
+        this.renderProducts(items, legacyGrid, "No items in stock right now. Call (803) 231-9420 for availability.");
+      }
+
+      this.syncInquirySelect(items);
     } catch (e) {
-      grid.innerHTML = `<p class="form-msg err" style="display:block;grid-column:1/-1">${esc(e.message)}</p>`;
+      const err = `<p class="form-msg err" style="display:block;grid-column:1/-1">${esc(e.message)}</p>`;
+      if (vehiclesGrid) vehiclesGrid.innerHTML = err;
+      if (radiosGrid) radiosGrid.innerHTML = err;
+      if (suppliesGrid) suppliesGrid.innerHTML = err;
+      if (legacyGrid) legacyGrid.innerHTML = err;
     }
 
     const form = document.getElementById("inquiry-form");
@@ -135,6 +223,8 @@ function esc(s) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  if (document.getElementById("products-grid")) PGT_APP.initSuppliesPage();
+  if (document.getElementById("radios-grid") || document.getElementById("vehicles-grid") || document.getElementById("products-grid")) {
+    PGT_APP.initSuppliesPage();
+  }
   if (document.getElementById("contact-form")) PGT_APP.initHomePage();
 });

@@ -21,6 +21,7 @@
         </div>
       </a>
       <div class="header-actions">
+        <a href="/capture">📷 Capture</a>
         <a href="/supplies.html">View Store</a>
         <button type="button" id="logout-btn" class="btn btn-secondary" hidden>Log Out</button>
       </div>
@@ -53,7 +54,7 @@
         <div class="admin-header">
           <div>
             <h1 class="section-title" style="text-align:left;margin-bottom:0.25rem">Inventory</h1>
-            <p class="admin-muted">Add, edit, or remove items. Changes appear on the supplies page immediately.</p>
+            <p class="admin-muted">Add, edit, or remove items. Changes appear on the supplies page immediately. Do not list bed pans, urinals, splints, sharps containers, suction canisters, OPAs, in-date medical stock, or non-expired AED pads.</p>
           </div>
         </div>
 
@@ -83,6 +84,7 @@
                 <select id="category" name="category">
                   <option value="supplies">Ambulance Supplies</option>
                   <option value="radios">Two-Way Radios</option>
+                  <option value="vehicles">Vehicles</option>
                 </select>
               </div>
               <div class="form-group">
@@ -95,7 +97,12 @@
               </div>
               <div class="form-group">
                 <label for="imageUrl">Photo URL (optional)</label>
-                <input type="url" id="imageUrl" name="imageUrl" placeholder="https://…">
+                <input type="url" id="imageUrl" name="imageUrl" placeholder="/img/radios/… or https://…">
+              </div>
+              <div class="form-group">
+                <label for="ebayListingUrl">eBay Listing URL (optional)</label>
+                <input type="url" id="ebayListingUrl" name="ebayListingUrl" placeholder="https://www.ebay.com/itm/…">
+                <p class="admin-muted" style="margin-top:0.35rem;font-size:0.8rem">Auto-filled when you publish via eBay below, or paste manually.</p>
               </div>
               <div class="admin-form-actions">
                 <button type="submit" id="save-btn" class="btn btn-primary">Add to Inventory</button>
@@ -121,10 +128,50 @@
             <div class="admin-form-actions">
               <button type="button" class="btn btn-primary" id="ebay-connect" hidden>Connect eBay Account</button>
               <button type="button" class="btn btn-primary" id="ebay-publish-all" hidden>Publish All to eBay</button>
+              <button type="button" class="btn btn-primary" id="ebay-publish-radios" hidden>Publish Radios to eBay</button>
+              <a href="/api/admin/ebay-export" class="btn btn-outline" id="ebay-csv-download">Download Listing Worksheet CSV</a>
+              <a href="https://www.ebay.com/sh/lst/active" class="btn btn-primary" id="ebay-seller-hub" target="_blank" rel="noopener">Open Seller Hub →</a>
               <button type="button" class="btn btn-outline" id="ebay-disconnect" hidden>Disconnect</button>
             </div>
-            <p class="admin-muted" style="margin-top:0.75rem;font-size:0.8rem">Requires eBay Developer app + Business Policies in Seller Hub. See <code>SETUP-EBAY.md</code>.</p>
+            <p class="admin-muted" style="margin-top:0.75rem;font-size:0.8rem" id="ebay-help-text">
+              <strong>No Developer API needed:</strong> use the Form Filler below (or CSV worksheet) in
+              <a href="https://www.ebay.com/sl/prelist/suggest" target="_blank" rel="noopener">Seller Hub</a>.
+              Auto-publish buttons appear only if eBay later approves a Developer account — see <code>SETUP-EBAY.md</code>.
+            </p>
             <div id="ebay-results" class="admin-fb-list"></div>
+          </div>
+
+          <div class="card" style="margin-bottom:1.25rem;border-color:#e53238">
+            <h2 style="font-family:var(--font-display);font-size:1.35rem;margin-bottom:0.5rem">eBay Form Filler</h2>
+            <p class="admin-muted" style="margin-bottom:0.75rem">
+              One-click opens eBay with title / category / condition prefilled. Install the userscript once so the red
+              <strong>PGT eBay Filler</strong> panel on ebay.com can fill price, description, and brand automatically.
+              Photos must still be uploaded by hand (eBay blocks remote image URL injection).
+            </p>
+            <ol class="admin-muted" style="margin:0 0 1rem 1.1rem;font-size:0.85rem;line-height:1.45">
+              <li>Install <a href="https://www.tampermonkey.net/" target="_blank" rel="noopener">Tampermonkey</a>, then open
+                <a href="/ebay-filler.user.js" target="_blank" rel="noopener">ebay-filler.user.js</a> → Install.</li>
+              <li>Stay signed in to eBay in Chrome.</li>
+              <li>Click <strong>List on eBay</strong> for an item below → on the eBay page, click <strong>Fill form</strong>.</li>
+              <li>Upload photos from the copied image URLs, review shipping, publish.</li>
+              <li>Paste the live <code>ebay.com/itm/…</code> URL back on the inventory item.</li>
+            </ol>
+            <div class="admin-form-actions" style="margin-bottom:0.75rem">
+              <button type="button" class="btn btn-outline" id="ebay-filler-refresh">Refresh queue</button>
+              <a class="btn btn-outline" href="/ebay-filler.user.js" target="_blank" rel="noopener">Install userscript</a>
+              <a class="btn btn-outline" href="https://www.ebay.com/sl/prelist/suggest" target="_blank" rel="noopener">Open empty listing form</a>
+            </div>
+            <p id="ebay-filler-status" class="admin-muted" style="margin-bottom:0.75rem">Loading queue…</p>
+            <div id="ebay-filler-queue" class="admin-fb-list"></div>
+          </div>
+
+          <div class="card" style="margin-bottom:1.25rem;border-color:#1877f2">
+            <h2 style="font-family:var(--font-display);font-size:1.35rem;margin-bottom:0.5rem">Facebook Groups</h2>
+            <p class="admin-muted" style="margin-bottom:1rem">Join these groups (or search), then paste a ready post. Read each group’s rules — many ban repeated ads or require “BST” flair.</p>
+            <div id="fb-group-posts" class="admin-fb-list" style="margin-bottom:1rem"></div>
+            <div id="fb-groups" class="admin-fb-list"></div>
+            <h3 style="font-family:var(--font-ui);font-size:0.95rem;margin:1.25rem 0 0.5rem">More groups to search</h3>
+            <div id="fb-group-searches" class="admin-fb-list"></div>
           </div>
 
           <div class="card" style="margin-bottom:1.25rem;border-color:#1877f2">

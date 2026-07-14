@@ -1,5 +1,6 @@
 import { isAdmin } from "../../_lib/auth.js";
 import { getInventory, saveInventory, normalizeItem } from "../../_lib/inventory.js";
+import { SALES_POLICY_SUMMARY, salesRestrictionReason } from "../../_lib/sales-policy.js";
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -8,7 +9,7 @@ export async function onRequest(context) {
 
   if (request.method === "GET") {
     const items = await getInventory(env);
-    return json({ items });
+    return json({ items, salesPolicy: SALES_POLICY_SUMMARY });
   }
 
   if (request.method === "POST") {
@@ -22,6 +23,9 @@ export async function onRequest(context) {
     const items = await getInventory(env);
     const item = normalizeItem(body);
     if (!item) return json({ error: "Name is required." }, 400);
+
+    const blocked = salesRestrictionReason(item);
+    if (blocked) return json({ error: `Blocked by sales policy: ${blocked}` }, 400);
 
     const idx = items.findIndex((i) => i.id === item.id);
     if (idx >= 0) items[idx] = item;
