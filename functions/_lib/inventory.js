@@ -1,6 +1,12 @@
 // Inventory storage in Cloudflare KV.
 
+import {
+  applyInventoryPolicyTweaks,
+  filterSellableItems,
+} from "./sales-policy.js";
+
 export const INVENTORY_KEY = "inventory:v1";
+export const SALES_POLICY_PURGE_KEY = "inventory:sales-policy-purge:v1";
 
 export const DEFAULT_INVENTORY = [
   {
@@ -36,7 +42,8 @@ export const DEFAULT_INVENTORY = [
     condition: "Used",
     category: "supplies",
     price: 350,
-    description: "Battery-powered suction with new canister. Holds charge well. Includes carry case.",
+    description:
+      "Battery-powered suction unit. Holds charge well. Includes carry case. Collection canisters sold separately are not offered.",
     imageUrl: "",
   },
   {
@@ -45,7 +52,8 @@ export const DEFAULT_INVENTORY = [
     condition: "Used",
     category: "supplies",
     price: 650,
-    description: "Adult/child pads included. Battery replaced 2025. Self-test passes.",
+    description:
+      "Battery replaced 2025. Self-test passes. Electrode pads are not included with this listing.",
     imageUrl: "",
   },
   {
@@ -120,26 +128,64 @@ Local pickup Blythewood, SC. CONUS shipping at buyer's expense.`,
   },
 ];
 
-export async function getInventory(env) {
-  if (!env.INVENTORY) return [...DEFAULT_INVENTORY];
-  const raw = await env.INVENTORY.get(INVENTORY_KEY);
-  if (!raw) {
-    await saveInventory(env, DEFAULT_INVENTORY);
-    return [...DEFAULT_INVENTORY];
+export async function getInventory(env, { applyPolicy = true } = {}) {
+  let items;
+  if (!env.INVENTORY) {
+    items = [...DEFAULT_INVENTORY];
+  } else {
+    const raw = await env.INVENTORY.get(INVENTORY_KEY);
+    if (!raw) {
+      await saveInventory(env, DEFAULT_INVENTORY, { applyPolicy: false });
+      items = [...DEFAULT_INVENTORY];
+    } else {
+      try {
+        const parsed = JSON.parse(raw);
+        items = Array.isArray(parsed) ? parsed : [...DEFAULT_INVENTORY];
+      } catch {
+        items = [...DEFAULT_INVENTORY];
+      }
+    }
   }
-  try {
-    const items = JSON.parse(raw);
-    return Array.isArray(items) ? items : [...DEFAULT_INVENTORY];
-  } catch {
-    return [...DEFAULT_INVENTORY];
+
+  if (!applyPolicy) return items;
+
+  const tweaked = applyInventoryPolicyTweaks(items);
+  const { sellable, removed } = filterSellableItems(tweaked);
+
+  const before = JSON.stringify(items);
+  const after = JSON.stringify(sellable);
+  if (env.INVENTORY && before !== after) {
+    await saveInventory(env, sellable, { applyPolicy: false });
+    if (removed.length) {
+      await env.INVENTORY.put(
+        SALES_POLICY_PURGE_KEY,
+        JSON.stringify({
+          purgedAt: new Date().toISOString(),
+          removed,
+        })
+      );
+    }
   }
+
+  return sellable;
 }
 
-export async function saveInventory(env, items) {
+export async function saveInventory(env, items, { applyPolicy = true } = {}) {
   if (!env.INVENTORY) throw new Error("Inventory storage not configured");
-  const normalized = items.map(normalizeItem).filter(Boolean);
-  await env.INVENTORY.put(INVENTORY_KEY, JSON.stringify(normalized));
-  return normalized;
+  let list = (items || []).map(normalizeItem).filter(Boolean);
+  if (applyPolicy) {
+    list = applyInventoryPolicyTweaks(list);
+    const { sellable, removed } = filterSellableItems(list);
+    if (removed.length) {
+      await env.INVENTORY.put(
+        SALES_POLICY_PURGE_KEY,
+        JSON.stringify({ purgedAt: new Date().toISOString(), removed })
+      );
+    }
+    list = sellable;
+  }
+  await env.INVENTORY.put(INVENTORY_KEY, JSON.stringify(list));
+  return list;
 }
 
 export function normalizeItem(item) {
@@ -147,25 +193,48 @@ export function normalizeItem(item) {
   const name = String(item.name).trim();
   if (!name) return null;
   const priceRaw = item.price;
-  const price = priceRaw === "" || priceRaw === null || priceRaw === undefined
-    ? null
-    : Number(priceRaw);
+  const price =
+    priceRaw === "" || priceRaw === null || priceRaw === undefined
+      ? null
+      : Number(priceRaw);
+  const quantityRaw = item.quantity;
+  const quantity =
+    quantityRaw === "" || quantityRaw === null || quantityRaw === undefined
+      ? 1
+      : Number(quantityRaw);
+  const extraImageUrls = Array.isArray(item.extraImageUrls)
+    ? item.extraImageUrls.map((u) => String(u || "").trim()).filter(Boolean)
+    : [];
+
   return {
     id: item.id || slugify(name),
     name,
+    ebayTitle: String(item.ebayTitle || "").trim(),
     condition: String(item.condition || "Used").trim(),
     category: String(item.category || "supplies").trim(),
+    brand: String(item.brand || "").trim(),
     price: Number.isFinite(price) && price >= 0 ? price : null,
+    quantity: Number.isFinite(quantity) && quantity > 0 ? quantity : 1,
+    serialNumber: String(item.serialNumber || "").trim(),
+    ebayCategoryId: String(item.ebayCategoryId || "").trim(),
     description: String(item.description || "").trim(),
     imageUrl: String(item.imageUrl || "").trim(),
+    extraImageUrls,
+    ebayListingUrl: String(item.ebayListingUrl || "").trim(),
+    ebayQueued: Boolean(item.ebayQueued),
+    captureId: String(item.captureId || "").trim(),
     updatedAt: new Date().toISOString(),
   };
 }
 
 export function slugify(text) {
-  return String(text)
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "")
-    .slice(0, 48) + "-" + Date.now().toString(36);
+  return (
+    String(text)
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 48) +
+    "-" +
+    Date.now().toString(36)
+  );
 }

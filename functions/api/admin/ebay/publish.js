@@ -2,6 +2,7 @@ import { isAdmin } from "../../../_lib/auth.js";
 import { getInventory } from "../../../_lib/inventory.js";
 import { publishInventoryItem } from "../../../_lib/ebay.js";
 import { saveEbayListing } from "../../../_lib/ebay-store.js";
+import { salesRestrictionReason } from "../../../_lib/sales-policy.js";
 
 export async function onRequestPost(context) {
   const { request, env } = context;
@@ -22,6 +23,11 @@ export async function onRequestPost(context) {
     const item = items.find((i) => i.id === id);
     if (!item) {
       results.push({ id, ok: false, error: "Item not found" });
+      continue;
+    }
+    const blocked = salesRestrictionReason(item);
+    if (blocked) {
+      results.push({ id, ok: false, name: item.name, error: `Blocked by sales policy: ${blocked}` });
       continue;
     }
     try {
