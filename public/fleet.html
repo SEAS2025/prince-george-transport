@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fleet Details | Prince George Transport</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml">
+</head>
+<body class="capture-body">
+  <header class="site-header capture-header">
+    <div class="container header-inner">
+      <a href="/" class="logo">
+        <img src="/img/logo.svg" alt="" width="40" height="40">
+        <div>
+          <div class="logo-text">PGT Fleet</div>
+          <div class="logo-sub">Owner mileage &amp; engine notes</div>
+        </div>
+      </a>
+      <button type="button" id="logout-btn" class="btn btn-secondary btn-sm" hidden>Lock</button>
+    </div>
+  </header>
+
+  <main class="capture-main">
+    <section data-panel="login" class="capture-login">
+      <div class="card">
+        <h1>Owner Access</h1>
+        <p class="admin-muted">Enter your fleet PIN to update the mileage and engine condition shown on each vehicle listing.</p>
+        <form id="pin-form">
+          <div class="form-group">
+            <label for="pin">Fleet PIN</label>
+            <input type="password" id="pin" name="pin" inputmode="numeric" autocomplete="one-time-code" required placeholder="••••••">
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Unlock</button>
+          <div id="login-msg" class="form-msg" role="status"></div>
+        </form>
+      </div>
+    </section>
+
+    <section data-panel="app" hidden>
+      <div class="capture-tabs">
+        <button type="button" class="capture-tab active" data-tab="edit">Edit Vehicles</button>
+        <button type="button" class="capture-tab" data-tab="vehicle">Add Vehicle</button>
+        <button type="button" class="capture-tab" data-tab="product">Add Product</button>
+      </div>
+
+      <div data-tab-panel="edit">
+        <div class="card">
+          <h1>Vehicle Details</h1>
+          <p class="admin-muted">Update the odometer reading and note the engine condition (e.g. "New engine — 500 mi", "Runs, needs jump", "Not running"). Changes go live on the site right away.</p>
+        </div>
+        <form id="fleet-form">
+          <div id="vehicles-list"></div>
+          <button type="submit" class="btn btn-primary btn-block" id="save-btn">Save Changes</button>
+          <div id="save-msg" class="form-msg" role="status"></div>
+        </form>
+      </div>
+
+      <div data-tab-panel="vehicle" hidden>
+        <form id="vehicle-form" class="card">
+          <h1>Add a Vehicle</h1>
+          <p class="admin-muted">List another ambulance or vehicle for sale. Photos upload straight from your phone.</p>
+          <div class="form-group">
+            <label>Title / Name *</label>
+            <input type="text" name="name" required placeholder="e.g. Ford E-Series Type II Ambulance — Unit P-08">
+          </div>
+          <div class="form-group">
+            <label>Price (USD)</label>
+            <input type="number" name="price" min="0" step="1" inputmode="numeric" placeholder="e.g. 3000">
+          </div>
+          <div class="form-group">
+            <label>Condition</label>
+            <input type="text" name="condition" placeholder="e.g. Used — Runs with jump">
+          </div>
+          <div class="form-group">
+            <label>Mileage (odometer)</label>
+            <input type="number" name="mileage" min="0" step="1" inputmode="numeric" placeholder="e.g. 92000">
+          </div>
+          <div class="form-group">
+            <label>Engine condition / notes</label>
+            <textarea name="engineNotes" rows="2" placeholder="e.g. New engine installed, runs strong"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea name="description" rows="3" placeholder="Details buyers should know — title status, features, wear, etc."></textarea>
+          </div>
+          <label class="form-check">
+            <input type="checkbox" name="acceptOffers" checked> Accept offers (show "OBO")
+          </label>
+          <div class="form-group">
+            <label>Photos</label>
+            <input type="file" class="photo-input" accept="image/*" capture="environment" multiple>
+            <div class="photo-preview"></div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Publish Vehicle</button>
+          <div class="form-msg create-msg" role="status"></div>
+        </form>
+      </div>
+
+      <div data-tab-panel="product" hidden>
+        <form id="product-form" class="card">
+          <h1>Add a Product</h1>
+          <p class="admin-muted">List EMS supplies, radios, or other equipment for sale.</p>
+          <div class="form-group">
+            <label>Name *</label>
+            <input type="text" name="name" required placeholder="e.g. Laerdal Suction Unit LCSU4">
+          </div>
+          <div class="form-group">
+            <label>Category</label>
+            <select name="category">
+              <option value="supplies">EMS Supplies</option>
+              <option value="radios">Two-Way Radio</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Price (USD)</label>
+            <input type="number" name="price" min="0" step="0.01" inputmode="decimal" placeholder="e.g. 45">
+          </div>
+          <div class="form-group">
+            <label>Quantity</label>
+            <input type="number" name="quantity" min="1" step="1" inputmode="numeric" value="1">
+          </div>
+          <div class="form-group">
+            <label>Condition</label>
+            <input type="text" name="condition" placeholder="e.g. New, Used — Good">
+          </div>
+          <div class="form-group">
+            <label>Brand</label>
+            <input type="text" name="brand" placeholder="e.g. Laerdal">
+          </div>
+          <div class="form-group">
+            <label>Serial number (optional)</label>
+            <input type="text" name="serialNumber" placeholder="If applicable">
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea name="description" rows="3" placeholder="Condition, contents, expiration, etc."></textarea>
+          </div>
+          <label class="form-check">
+            <input type="checkbox" name="acceptOffers"> Accept offers (show "OBO")
+          </label>
+          <div class="form-group">
+            <label>Photos</label>
+            <input type="file" class="photo-input" accept="image/*" capture="environment" multiple>
+            <div class="photo-preview"></div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Publish Product</button>
+          <div class="form-msg create-msg" role="status"></div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <script src="/js/fleet.js"></script>
+</body>
+</html>

@@ -43,7 +43,9 @@ const PGT_ADMIN = {
     document.getElementById("copy-all-fb")?.addEventListener("click", () => this.copyAllFacebook());
     document.getElementById("ebay-connect")?.addEventListener("click", () => this.connectEbay());
     document.getElementById("ebay-publish-all")?.addEventListener("click", () => this.publishAllEbay());
+    document.getElementById("ebay-publish-radios")?.addEventListener("click", () => this.publishRadiosEbay());
     document.getElementById("ebay-disconnect")?.addEventListener("click", () => this.disconnectEbay());
+    document.getElementById("ebay-filler-refresh")?.addEventListener("click", () => this.loadEbayFillerQueue());
 
     this.handleEbayRedirect();
 
@@ -54,6 +56,7 @@ const PGT_ADMIN = {
         await this.loadItems();
         await this.loadMarketing();
         await this.loadEbay();
+        await this.loadEbayFillerQueue();
       } else {
         this.show("login");
       }
@@ -77,6 +80,8 @@ const PGT_ADMIN = {
       this.show("dashboard");
       await this.loadItems();
       await this.loadMarketing();
+      await this.loadEbay();
+      await this.loadEbayFillerQueue();
     } catch (e) {
       if (msg) { msg.className = "form-msg err"; msg.textContent = e.message; }
     } finally {
@@ -116,7 +121,8 @@ const PGT_ADMIN = {
       <div class="admin-item" data-id="${item.id}">
         <div class="admin-item-main">
           <strong>${esc(item.name)}</strong>
-          <span class="admin-item-meta">${esc(item.condition)} · ${item.category} · ${formatPrice(item.price)}</span>
+          <span class="admin-item-meta">${esc(item.condition)} · ${item.category}${item.quantity > 1 ? ` · qty ${item.quantity}` : ""} · ${formatPrice(item.price)}${item.imageUrl ? " · 📷" : ""}${item.ebayListingUrl ? " · eBay ✓" : ""}</span>
+          ${item.ebayListingUrl ? `<p class="admin-item-desc"><a href="${esc(item.ebayListingUrl)}" target="_blank" rel="noopener">Buy on eBay</a></p>` : ""}
           ${item.description ? `<p class="admin-item-desc">${esc(item.description)}</p>` : ""}
         </div>
         <div class="admin-item-actions">
@@ -149,6 +155,7 @@ const PGT_ADMIN = {
     form.price.value = item.price ?? "";
     form.description.value = item.description || "";
     form.imageUrl.value = item.imageUrl || "";
+    form.ebayListingUrl.value = item.ebayListingUrl || "";
     document.getElementById("form-title").textContent = "Edit Item";
     document.getElementById("save-btn").textContent = "Update Item";
     document.getElementById("cancel-edit").hidden = false;
@@ -179,6 +186,7 @@ const PGT_ADMIN = {
       price: form.price.value === "" ? null : Number(form.price.value),
       description: form.description.value.trim(),
       imageUrl: form.imageUrl.value.trim(),
+      ebayListingUrl: form.ebayListingUrl.value.trim(),
     };
 
     if (!payload.name) {
@@ -212,19 +220,170 @@ const PGT_ADMIN = {
     document.querySelectorAll("[data-tab-panel]").forEach((p) => {
       p.hidden = p.dataset.tabPanel !== name;
     });
+    if (name === "marketing") this.loadEbayFillerQueue();
+  },
+
+  async loadEbayFillerQueue() {
+    const statusEl = document.getElementById("ebay-filler-status");
+    const listEl = document.getElementById("ebay-filler-queue");
+    if (!listEl) return;
+
+    try {
+      const data = await this.fetchJson("/api/admin/ebay-draft");
+      this.ebayFillerQueue = data.queue || [];
+      if (statusEl) {
+        statusEl.textContent = data.count
+          ? `${data.count} priced item(s) ready to list (vehicles and already-linked eBay URLs skipped).`
+          : "No items in the filler queue — add prices, or clear ebay listing URLs for items you still need to post.";
+      }
+      listEl.innerHTML = (data.queue || [])
+        .map(
+          (d) => `
+        <div class="admin-fb-item" data-draft-id="${esc(d.id)}">
+          <strong>${esc(d.title)}</strong>
+          <span class="admin-item-meta">$${esc(d.price)} · qty ${esc(d.quantity)} · ${esc(d.condition)} · cat ${esc(d.categoryId)}</span>
+          <div class="admin-form-actions" style="margin-top:0.6rem">
+            <button type="button" class="btn btn-primary btn-sm" data-ebay-list="${esc(d.id)}">List on eBay</button>
+            <button type="button" class="btn btn-outline btn-sm" data-ebay-prelist="${esc(d.id)}">Open suggest step</button>
+            <button type="button" class="btn btn-outline btn-sm" data-ebay-copy="${esc(d.id)}">Copy draft</button>
+            <button type="button" class="btn btn-outline btn-sm" data-ebay-copy-title="${esc(d.id)}">Copy title</button>
+          </div>
+        </div>`
+        )
+        .join("");
+
+      listEl.querySelectorAll("[data-ebay-list]").forEach((btn) => {
+        btn.addEventListener("click", () => this.startEbayFill(btn.dataset.ebayList, "list"));
+      });
+      listEl.querySelectorAll("[data-ebay-prelist]").forEach((btn) => {
+        btn.addEventListener("click", () => this.startEbayFill(btn.dataset.ebayPrelist, "prelist"));
+      });
+      listEl.querySelectorAll("[data-ebay-copy]").forEach((btn) => {
+        btn.addEventListener("click", () => this.copyEbayDraft(btn.dataset.ebayCopy));
+      });
+      listEl.querySelectorAll("[data-ebay-copy-title]").forEach((btn) => {
+        btn.addEventListener("click", () => this.copyEbayDraftField(btn.dataset.ebayCopyTitle, "title"));
+      });
+    } catch (e) {
+      if (statusEl) statusEl.textContent = `Filler queue error: ${e.message}`;
+    }
+  },
+
+  getEbayDraft(id) {
+    return (this.ebayFillerQueue || []).find((d) => d.id === id) || null;
+  },
+
+  async startEbayFill(itemId, mode = "list") {
+    const draft = this.getEbayDraft(itemId);
+    if (!draft) return alert("Draft not found — refresh the queue.");
+
+    try {
+      await this.fetchJson("/api/admin/ebay-draft", {
+        method: "POST",
+        body: JSON.stringify({ itemId }),
+      });
+    } catch (e) {
+      console.warn("Could not arm remote draft:", e);
+    }
+
+    try {
+      await navigator.clipboard.writeText(`PGT_EBAY::${JSON.stringify(draft)}`);
+    } catch {
+      /* userscript can still Load draft from API */
+    }
+
+    const url = mode === "prelist" ? draft.prelistUrl : draft.listUrl;
+    window.open(url, "_blank", "noopener");
+  },
+
+  async copyEbayDraft(itemId) {
+    const draft = this.getEbayDraft(itemId);
+    if (!draft) return;
+    try {
+      await this.fetchJson("/api/admin/ebay-draft", {
+        method: "POST",
+        body: JSON.stringify({ itemId }),
+      });
+      await navigator.clipboard.writeText(`PGT_EBAY::${JSON.stringify(draft)}`);
+      alert("Draft copied. On eBay, open the PGT panel → From clipboard (or Load draft).");
+    } catch (e) {
+      alert(e.message);
+    }
+  },
+
+  async copyEbayDraftField(itemId, field) {
+    const draft = this.getEbayDraft(itemId);
+    if (!draft) return;
+    try {
+      await navigator.clipboard.writeText(String(draft[field] ?? ""));
+    } catch (e) {
+      alert(e.message);
+    }
   },
 
   async loadMarketing() {
     const fbNote = document.getElementById("fb-note");
     const fbPosts = document.getElementById("fb-posts");
+    const fbGroups = document.getElementById("fb-groups");
+    const fbGroupPosts = document.getElementById("fb-group-posts");
+    const fbGroupSearches = document.getElementById("fb-group-searches");
     const leadsEl = document.getElementById("emt-leads");
-    if (!fbPosts && !leadsEl) return;
+    if (!fbPosts && !leadsEl && !fbGroups) return;
 
     try {
       const data = await this.fetchJson("/api/admin/marketing");
       this.marketing = data;
 
       if (fbNote) fbNote.textContent = data.marketplaceNote;
+
+      if (fbGroupPosts && data.facebookGroupPosts) {
+        const labels = {
+          vehicles: "Vehicles post",
+          supplies: "Supplies post",
+          radios: "Radios post",
+          highValue: "High-value gear post",
+        };
+        fbGroupPosts.innerHTML = Object.entries(data.facebookGroupPosts).map(([key, text]) => `
+          <div class="admin-fb-item">
+            <strong>${esc(labels[key] || key)}</strong>
+            <pre>${esc(text)}</pre>
+            <button type="button" class="btn btn-outline btn-sm" data-copy-group-post="${esc(key)}">Copy post</button>
+          </div>
+        `).join("");
+        fbGroupPosts.querySelectorAll("[data-copy-group-post]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const text = data.facebookGroupPosts[btn.dataset.copyGroupPost];
+            if (text) this.copyText(text, btn);
+          });
+        });
+      }
+
+      if (fbGroups) {
+        fbGroups.innerHTML = (data.facebookGroups || []).map((g) => {
+          const searchUrl = "https://www.facebook.com/search/groups/?q=" + encodeURIComponent(g.searchHint || g.name);
+          return `
+          <div class="admin-fb-item">
+            <strong>${esc(g.name)}</strong>
+            <div class="admin-item-meta">${esc(g.focus)} · ${esc(g.postType)}</div>
+            <p class="admin-item-desc">${esc(g.why)}</p>
+            <div class="admin-form-actions" style="margin-top:0.5rem">
+              <a class="btn btn-primary btn-sm" href="${esc(g.url)}" target="_blank" rel="noopener">Open group</a>
+              <a class="btn btn-outline btn-sm" href="${esc(searchUrl)}" target="_blank" rel="noopener">Search if link moved</a>
+            </div>
+          </div>`;
+        }).join("");
+      }
+
+      if (fbGroupSearches) {
+        fbGroupSearches.innerHTML = (data.facebookGroupSearches || []).map((s) => `
+          <div class="admin-fb-item">
+            <strong>${esc(s.query)}</strong>
+            <span class="admin-item-meta">${esc(s.postType)}</span>
+            <a class="btn btn-outline btn-sm" href="${esc(s.url)}" target="_blank" rel="noopener">Search on Facebook</a>
+          </div>
+        `).join("");
+      }
+
       if (fbPosts) {
         fbPosts.innerHTML = (data.facebookPosts || []).map((p) => `
           <div class="admin-fb-item">
@@ -288,6 +447,7 @@ const PGT_ADMIN = {
     const statusEl = document.getElementById("ebay-status");
     const connectBtn = document.getElementById("ebay-connect");
     const publishBtn = document.getElementById("ebay-publish-all");
+    const publishRadiosBtn = document.getElementById("ebay-publish-radios");
     const disconnectBtn = document.getElementById("ebay-disconnect");
     const resultsEl = document.getElementById("ebay-results");
     if (!statusEl) return;
@@ -297,9 +457,10 @@ const PGT_ADMIN = {
       this.ebayStatus = status;
 
       if (!status.configured) {
-        statusEl.textContent = "eBay app not configured on server. Add EBAY_CLIENT_ID, EBAY_CLIENT_SECRET, and EBAY_RUNAME secrets (see SETUP-EBAY.md).";
+        statusEl.innerHTML = "API auto-publish is <strong>not available</strong> (Developer account not connected). You can still list manually — download the worksheet CSV and use Seller Hub.";
         connectBtn.hidden = true;
         publishBtn.hidden = true;
+        if (publishRadiosBtn) publishRadiosBtn.hidden = true;
         disconnectBtn.hidden = true;
         return;
       }
@@ -308,12 +469,14 @@ const PGT_ADMIN = {
         statusEl.textContent = "Not connected. Click below to authorize your eBay seller account.";
         connectBtn.hidden = false;
         publishBtn.hidden = true;
+        if (publishRadiosBtn) publishRadiosBtn.hidden = true;
         disconnectBtn.hidden = true;
       } else {
         const policyNote = status.policiesReady ? "Business policies ready." : "Will auto-fetch policies on first publish.";
         statusEl.textContent = `Connected since ${new Date(status.connectedAt).toLocaleDateString()}. ${policyNote} Category: ${status.categoryId}.`;
         connectBtn.hidden = true;
         publishBtn.hidden = false;
+        if (publishRadiosBtn) publishRadiosBtn.hidden = false;
         disconnectBtn.hidden = false;
       }
 
@@ -352,6 +515,28 @@ const PGT_ADMIN = {
     await this.loadEbay();
   },
 
+  async publishRadiosEbay() {
+    const radioIds = this.items.filter((i) => i.category === "radios").map((i) => i.id);
+    if (!radioIds.length) return alert("No radio items in inventory.");
+    if (!confirm(`Publish ${radioIds.length} radio listing(s) to eBay?`)) return;
+
+    const btn = document.getElementById("ebay-publish-radios");
+    btn.disabled = true;
+    try {
+      const result = await this.fetchJson("/api/admin/ebay/publish", {
+        method: "POST",
+        body: JSON.stringify({ itemIds: radioIds }),
+      });
+      this.showEbayResults(result);
+      await this.loadEbay();
+      await this.loadItems();
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      btn.disabled = false;
+    }
+  },
+
   async publishAllEbay() {
     const btn = document.getElementById("ebay-publish-all");
     if (!confirm("Publish all inventory items to eBay? Items need a price set.")) return;
@@ -360,6 +545,7 @@ const PGT_ADMIN = {
       const result = await this.fetchJson("/api/admin/ebay/publish", { method: "POST", body: JSON.stringify({}) });
       this.showEbayResults(result);
       await this.loadEbay();
+      await this.loadItems();
     } catch (e) {
       alert(e.message);
     } finally {
@@ -377,6 +563,7 @@ const PGT_ADMIN = {
       });
       this.showEbayResults(result);
       await this.loadEbay();
+      await this.loadItems();
     } catch (e) {
       alert(e.message);
     } finally {

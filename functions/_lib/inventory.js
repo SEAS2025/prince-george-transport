@@ -49,45 +49,146 @@ export const DEFAULT_INVENTORY = [
     imageUrl: "",
   },
   {
-    id: "radio-cm200",
-    name: "Motorola VHF Mobile Radios — CM200/CM300/CM200d (6 Available)",
+    id: "radio-cm200-922tmu3381",
+    name: "Motorola Radius CM200 VHF Mobile Radio — SN 922TMU3381",
+    ebayTitle: "Motorola Radius CM200 VHF 45W Mobile Radio Kit Mic Harness Bracket",
     condition: "Used",
     category: "radios",
+    brand: "Motorola",
     price: 165,
-    description: `Fleet-retired Motorola VHF mobile radios removed from Prince George Transport ambulances. Six (6) units total — $930 for all six ($155/ea). Photos on file for 4 units; 2 additional units same fleet (labels pending).
+    quantity: 1,
+    serialNumber: "922TMU3381",
+    ebayCategoryId: "46539",
+    description: `Fleet-retired Motorola Radius CM200 VHF mobile radio from Prince George Transport ambulance.
 
-PHOTO-CONFIRMED UNITS (4 of 6):
+Model: AAM50KQD9AA1AN · PMUD1875C · FCC ABZ99FT3046
+Serial: 922TMU3381 · PMLN4900C control head
+VHF 146–174 MHz · 4 channels · 25–45W
 
-① CM200 45W — SN 922TMU3381 (IMG_2367)
-   Model: AAM50KQD9AA1AN · PMUD1875C · FCC ABZ99FT3046
-   VHF 146–174 MHz · 4 ch · 25–45W · PMLN4900C control head
-   Photo: Radius CM200 faceplate, green LED shows CH 1 (powers on), dusty from fleet use
+Verified powering on (channel 1 displayed). Well-used fleet cosmetics — dust, scuffs, worn buttons.
 
-② CM300 25W — SN 922TMC5022 (IMG_2368)
-   Model: AAM50KNF9AA1AN · PMUD1873B · FCC AZ492FT3805
-   VHF 146–174 MHz · 32 ch · 1–25W
-   Photo: Radius CM300 faceplate, P1–P4 buttons, volume knob edge chipped/worn, LCD present
+COMPLETE KIT INCLUDED:
+• CM200 mobile radio
+• Hand microphone
+• Vehicle wire harness
+• Mounting bracket
 
-③ CM200 45W — SN 922TNE0190 (IMG_2365)
-   Model: AAM50KQD9AA1AN · PMUD1875C · FCC ABZ99FT3046
-   VHF 146–174 MHz · 4 ch · 25–45W · PMLN4598C control head
-   Photo: Radius CM200 in dash bracket, CH 1 on display, red/black harness attached
+Reprogramming required (Motorola CPS). Sold as-is — no bench TX/RX certification.
+Local pickup Blythewood, SC. CONUS shipping at buyer's expense.`,
+    imageUrl: "/img/radios/cm200-922tmu3381.jpg",
+    extraImageUrls: ["/img/radios/cm200-922tmu3381-label.jpg"],
+  },
+  {
+    id: "radio-cm200-922tne0190",
+    name: "Motorola Radius CM200 VHF Mobile Radio — SN 922TNE0190",
+    ebayTitle: "Motorola Radius CM200 VHF 45W Mobile Radio Bracket Harness Kit",
+    condition: "Used",
+    category: "radios",
+    brand: "Motorola",
+    price: 165,
+    quantity: 1,
+    serialNumber: "922TNE0190",
+    ebayCategoryId: "46539",
+    description: `Fleet-retired Motorola Radius CM200 VHF mobile radio from Prince George Transport ambulance.
 
-④ CM200d 45W — SN 751TGQ0925 (IMG_2366)
-   Model: AAM01JQC9JC1AN · PMUD3237A · FCC ABZ99FT3091
-   VHF 136–174 MHz · 16 ch · 25–45W · PMLN6321A control head
-   Photo: CM200d faceplate (+Vol-/CH rockers, P1/P2), MOTOTRBO generation, bracket mounted
+Model: AAM50KQD9AA1AN · PMUD1875C · FCC ABZ99FT3046
+Serial: 922TNE0190 · PMLN4598C control head
+VHF 146–174 MHz · 4 channels · 25–45W
 
-VISUAL CONDITION (from photos):
-• Well-used fleet cosmetics — dust, scuffs, worn buttons/knobs
-• CM200 units verified powering on (channel 1 displayed)
-• Mounting brackets and wire harnesses visible in photos
-• Sold as-is — no bench TX/RX certification
+Mounted in dash bracket with wire harness attached. Channel 1 displayed. Fleet-used condition.
+
+COMPLETE KIT INCLUDED:
+• CM200 mobile radio
+• Hand microphone
+• Vehicle wire harness
+• Mounting bracket
+
+Reprogramming required (Motorola CPS). Sold as-is — no bench TX/RX certification.
+Local pickup Blythewood, SC. CONUS shipping at buyer's expense.`,
+    imageUrl: "/img/radios/cm200-922tne0190.jpg",
+    extraImageUrls: ["/img/radios/cm200-922tne0190-label.jpg"],
+  },
+  {
+    id: "radio-cm300-922tmc5022",
+    name: "Motorola Radius CM300 VHF Mobile Radio — SN 922TMC5022",
+    ebayTitle: "Motorola Radius CM300 VHF 32Ch Mobile Radio Kit Mic Harness",
+    condition: "Used",
+    category: "radios",
+    brand: "Motorola",
+    price: 175,
+    quantity: 1,
+    serialNumber: "922TMC5022",
+    ebayCategoryId: "46539",
+    description: `Fleet-retired Motorola Radius CM300 VHF mobile radio from Prince George Transport ambulance.
+
+Model: AAM50KNF9AA1AN · PMUD1873B · FCC AZ492FT3805
+Serial: 922TMC5022
+VHF 146–174 MHz · 32 channels · 1–25W
+
+P1–P4 programmable buttons, LCD present. Volume knob edge chipped/worn from fleet use.
+
+COMPLETE KIT INCLUDED:
+• CM300 mobile radio
+• Hand microphone
+• Vehicle wire harness
+• Mounting bracket
+
+Reprogramming required (Motorola CPS). Sold as-is — no bench TX/RX certification.
+Local pickup Blythewood, SC. CONUS shipping at buyer's expense.`,
+    imageUrl: "/img/radios/cm300-922tmc5022.jpg",
+    extraImageUrls: ["/img/radios/cm300-922tmc5022-label.jpg"],
+  },
+  {
+    id: "radio-cm200d-751tgq0925",
+    name: "Motorola CM200d MOTOTRBO VHF Mobile Radio — SN 751TGQ0925",
+    ebayTitle: "Motorola CM200d MOTOTRBO VHF 16Ch DMR-Ready Mobile Radio Kit",
+    condition: "Used",
+    category: "radios",
+    brand: "Motorola",
+    price: 195,
+    quantity: 1,
+    serialNumber: "751TGQ0925",
+    ebayCategoryId: "46539",
+    description: `Fleet-retired Motorola CM200d MOTOTRBO VHF mobile radio from Prince George Transport ambulance.
+
+Model: AAM01JQC9JC1AN · PMUD3237A · FCC ABZ99FT3091
+Serial: 751TGQ0925 · PMLN6321A control head
+VHF 136–174 MHz · 16 channels · 25–45W
+
+DMR-upgradeable MOTOTRBO generation. Bracket mounted. Fleet-used cosmetics.
+
+COMPLETE KIT INCLUDED:
+• CM200d mobile radio
+• Hand microphone
+• Vehicle wire harness
+• Mounting bracket
+
+Reprogramming required (Motorola CM200d CPS). Sold as-is — no bench TX/RX certification.
+Local pickup Blythewood, SC. CONUS shipping at buyer's expense.`,
+    imageUrl: "/img/radios/cm200d-751tgq0925.jpg",
+    extraImageUrls: ["/img/radios/cm200d-751tgq0925-label.jpg"],
+  },
+  {
+    id: "radio-vhf-lot-2",
+    name: "Motorola VHF Mobile Radio — Fleet Unit (2 Available, Labels Pending)",
+    ebayTitle: "Motorola VHF Mobile Radio Ambulance Fleet 2 Units Mic Harness Bracket",
+    condition: "Used",
+    category: "radios",
+    brand: "Motorola",
+    price: 155,
+    quantity: 2,
+    ebayCategoryId: "46539",
+    description: `Two additional fleet-retired Motorola VHF mobile radios from Prince George Transport ambulances. Same lot as documented CM200/CM300/CM200d units — model labels and serial photos pending.
+
+$155 each · $310 for both.
 
 COMPLETE KIT PER RADIO:
-• Mobile radio + hand microphone + vehicle wire harness + mounting bracket
+• Mobile radio
+• Hand microphone
+• Vehicle wire harness
+• Mounting bracket
 
-Reprogramming required (Motorola CPS; CM200d uses CM200d CPS). CM200d upgradeable to DMR digital.
+Reprogramming required (Motorola CPS). Sold as-is — no bench TX/RX certification.
 Local pickup Blythewood, SC. CONUS shipping at buyer's expense.`,
     imageUrl: "",
   },
@@ -150,16 +251,41 @@ export function normalizeItem(item) {
   const price = priceRaw === "" || priceRaw === null || priceRaw === undefined
     ? null
     : Number(priceRaw);
+  const qtyRaw = item.quantity;
+  const quantity = qtyRaw === "" || qtyRaw === null || qtyRaw === undefined
+    ? 1
+    : Math.max(1, Math.floor(Number(qtyRaw)) || 1);
+
   return {
     id: item.id || slugify(name),
     name,
+    ebayTitle: String(item.ebayTitle || "").trim(),
     condition: String(item.condition || "Used").trim(),
     category: String(item.category || "supplies").trim(),
+    brand: String(item.brand || "").trim(),
     price: Number.isFinite(price) && price >= 0 ? price : null,
+    quantity,
+    serialNumber: String(item.serialNumber || "").trim(),
+    ebayCategoryId: String(item.ebayCategoryId || "").trim(),
     description: String(item.description || "").trim(),
     imageUrl: String(item.imageUrl || "").trim(),
+    extraImageUrls: Array.isArray(item.extraImageUrls)
+      ? item.extraImageUrls.map((u) => String(u || "").trim()).filter(Boolean)
+      : [],
+    ebayListingUrl: String(item.ebayListingUrl || "").trim(),
+    ebayQueued: item.ebayQueued === true,
+    acceptOffers: item.acceptOffers === true,
+    mileage: normalizeMileage(item.mileage),
+    engineNotes: String(item.engineNotes || "").trim(),
+    captureId: String(item.captureId || "").trim(),
     updatedAt: new Date().toISOString(),
   };
+}
+
+function normalizeMileage(raw) {
+  if (raw === "" || raw === null || raw === undefined) return null;
+  const n = Number(raw);
+  return Number.isFinite(n) && n >= 0 ? Math.round(n) : null;
 }
 
 export function slugify(text) {

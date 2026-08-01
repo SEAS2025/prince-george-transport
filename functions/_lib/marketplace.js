@@ -5,6 +5,14 @@
 const SITE_URL = "https://prince-george-transport.pages.dev";
 const LOCATION = "Blythewood, SC";
 
+function resolveImageUrl(item) {
+  const raw = String(item.imageUrl || "").trim();
+  if (!raw) return "";
+  if (raw.startsWith("https://")) return raw;
+  if (raw.startsWith("/")) return `${SITE_URL}${raw}`;
+  return raw;
+}
+
 export function fbListingText(item) {
   const price = item.price != null ? `$${item.price}` : "Make offer";
   const lines = [
@@ -49,7 +57,7 @@ export function inventoryToMarketplaceCsv(items) {
     fbCategory(item),
     item.condition || "Used",
     LOCATION,
-    item.imageUrl || "",
+    resolveImageUrl(item),
     `${SITE_URL}/supplies.html#inventory`,
   ]);
 
@@ -63,24 +71,64 @@ function csvCell(value) {
 }
 
 export function outreachEmailTemplate(lead, items) {
-  const sample = items.slice(0, 3).map((i) => `• ${i.name}${i.price != null ? ` — $${i.price}` : ""}`).join("\n");
-  return `Subject: Surplus EMS training equipment available — Prince George Transport
+  const highlights = pickTrainingHighlights(items);
+  const sample = highlights
+    .map((i) => `• ${i.name}${i.price != null ? ` — $${i.price}` : ""}`)
+    .join("\n");
 
-Hello ${lead.contact || "there"},
+  const isAgency = /dph|department of public health/i.test(lead.name);
+  if (isAgency) {
+    return `Subject: Surplus EMS training equipment — may help SC EMT programs
 
-I'm reaching out from Prince George Transport, a licensed non-emergency ambulance service in Blythewood / Columbia area (NPI 1922468909).
+Hello ${lead.contact || "EMS and Trauma team"},
 
-We are retiring used ambulance supplies and two-way radios from our fleet. Several items may be useful for EMT skills labs and training programs:
+Prince George Transport is a licensed SC ambulance service in Blythewood (NPI 1922468909). We are liquidating fleet-retired EMS supplies, AEDs, suction units, and Motorola radios.
 
-${sample || "• Various stretchers, O2 equipment, radios, and EMS supplies"}
+These items may help DPH-approved EMT/paramedic training programs for skills labs (expired sterile items clearly marked training/display only).
 
-All items are sold as-is at reduced prices. Local pickup available at 200 Louthian Way, Blythewood, SC 29016.
+Full inventory with photos and prices:
+https://prince-george-transport.pages.dev/supplies
 
-Full inventory: ${SITE_URL}/supplies.html
-Phone: (803) 231-9420
-
-Would your program be interested in reviewing our current list?
+If you can share this with training officers or point us to the best contact list for approved programs, we would appreciate it.
 
 Thank you,
-Prince George Transport`;
+Prince George Transport
+200 Louthian Way, Blythewood, SC 29016
+(803) 231-9420`;
+  }
+
+  return `Subject: Surplus EMS training equipment for your program — Prince George Transport
+
+Hello ${lead.contact || "EMS Program team"},
+
+I'm reaching out from Prince George Transport, a licensed non-emergency ambulance service in Blythewood (Columbia metro), NPI 1922468909 / SC license E3044851.
+
+We are retiring used ambulance supplies, airway/O2 gear, AEDs, suction equipment, and Motorola VHF radios. Several items may fit EMT/paramedic skills labs and training use:
+
+${sample || "• EMS training gear, AEDs, suction, radios, and more — see full list online"}
+
+Browse the full inventory (photos + prices):
+https://prince-george-transport.pages.dev/supplies
+
+Notes:
+• Local pickup at 200 Louthian Way, Blythewood, SC 29016
+• Items sold as-is; expired sterile products are labeled for training/display only
+• Happy to pull a quote list for specific lab needs
+
+Would your program like to review the list or schedule a walkthrough?
+
+Thank you,
+Prince George Transport
+(803) 231-9420`;
+}
+
+function pickTrainingHighlights(items) {
+  if (!Array.isArray(items) || !items.length) return [];
+  const preferred = items.filter((i) => {
+    if (i.category === "vehicles") return false;
+    const t = `${i.name} ${i.description}`.toLowerCase();
+    return /aed|suction|laerdal|airway|bvm|stretcher|board|collar|defib|traction|radio|yankauer|mask|pads/i.test(t);
+  });
+  const pool = preferred.length ? preferred : items.filter((i) => i.category !== "vehicles");
+  return pool.slice(0, 8);
 }

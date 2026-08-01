@@ -6,6 +6,14 @@ import {
   getEbayConfig,
   saveEbayConfig,
 } from "./ebay-store.js";
+import {
+  resolveImageUrl,
+  ebayCategoryId,
+  ebayTitle,
+  ebayDescription,
+  ebayBrand,
+  listingImageUrls,
+} from "./ebay-export.js";
 
 const SCOPES = [
   "https://api.ebay.com/oauth/api_scope/sell.inventory",
@@ -224,43 +232,44 @@ function mapCondition(condition) {
   return "USED_EXCELLENT";
 }
 
-function buildDescription(item) {
-  const lines = [
-    item.description || "",
-    "",
-    "Sold by Prince George Transport — licensed SC ambulance service (NPI 1922468909).",
-    "Pickup available in Blythewood, SC. Call (803) 231-9420 with questions.",
-    "",
-    "https://prince-george-transport.pages.dev/supplies.html",
-  ];
-  return lines.filter(Boolean).join("\n");
-}
-
 export async function publishInventoryItem(env, item) {
   if (!item.price || item.price <= 0) {
     throw new Error(`${item.name}: price required to list on eBay`);
   }
 
   const cfg = ebayEnv(env);
+  const siteUrl = env.SITE_URL || "https://prince-george-transport.pages.dev";
   const policies = await ensureBusinessPolicies(env);
   const locationKey = await ensureMerchantLocation(env);
   const sku = item.id.replace(/[^a-zA-Z0-9_-]/g, "-").slice(0, 50);
+  const quantity = item.quantity ?? 1;
+  const description = ebayDescription(item);
+  const imageUrls = listingImageUrls(item, siteUrl);
+  const brand = ebayBrand(item);
+  const aspects = {
+    "Item Type": [
+      item.category === "radios"
+        ? "Two-Way Radio"
+        : item.category === "vehicles"
+          ? "Ambulance"
+          : "Medical Equipment",
+    ],
+  };
+  if (brand) aspects.Brand = [brand];
+  if (item.serialNumber) aspects["Serial Number"] = [item.serialNumber];
 
   const inventoryBody = {
-    availability: { shipToLocationAvailability: { quantity: 1 } },
+    availability: { shipToLocationAvailability: { quantity } },
     condition: mapCondition(item.condition),
     product: {
-      title: item.name.slice(0, 80),
-      description: buildDescription(item),
-      aspects: {
-        Brand: ["Unbranded"],
-        "Item Type": [item.category === "radios" ? "Two-Way Radio" : "Medical Equipment"],
-      },
+      title: ebayTitle(item),
+      description,
+      aspects,
     },
   };
 
-  if (item.imageUrl && item.imageUrl.startsWith("https://")) {
-    inventoryBody.product.imageUrls = [item.imageUrl];
+  if (imageUrls.length) {
+    inventoryBody.product.imageUrls = imageUrls;
   }
 
   await ebayFetch(env, `/sell/inventory/v1/inventory_item/${encodeURIComponent(sku)}`, {
@@ -274,10 +283,10 @@ export async function publishInventoryItem(env, item) {
       sku,
       marketplaceId: cfg.marketplaceId,
       format: "FIXED_PRICE",
-      availableQuantity: 1,
-      categoryId: cfg.categoryId,
+      availableQuantity: quantity,
+      categoryId: ebayCategoryId(item) || cfg.categoryId,
       merchantLocationKey: locationKey,
-      listingDescription: buildDescription(item),
+      listingDescription: description,
       listingPolicies: {
         paymentPolicyId: policies.paymentPolicyId,
         fulfillmentPolicyId: policies.fulfillmentPolicyId,
