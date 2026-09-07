@@ -233,7 +233,7 @@ const PGT_ADMIN = {
       this.ebayFillerQueue = data.queue || [];
       if (statusEl) {
         statusEl.textContent = data.count
-          ? `${data.count} priced item(s) ready to list (vehicles and already-linked eBay URLs skipped).`
+          ? `${data.count} priced item(s) ready to list (already-linked eBay URLs skipped).`
           : "No items in the filler queue — add prices, or clear ebay listing URLs for items you still need to post.";
       }
       listEl.innerHTML = (data.queue || [])
