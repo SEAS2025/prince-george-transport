@@ -5,6 +5,7 @@ import {
   isRestrictedItem,
   salesRestrictionReason,
 } from "./sales-policy.js";
+import { rewriteVehicleEbayDescription } from "./vehicle-ebay-copy.js";
 
 const SITE_URL = "https://prince-george-transport.pages.dev";
 export const EBAY_ARMED_DRAFT_KEY = "ebay:armed-draft:v1";
@@ -24,20 +25,28 @@ function defaultCategoryId(item) {
 }
 
 export function buildEbayDraft(item) {
-  const title = (item.ebayTitle || item.name || "").slice(0, 80);
-  const { conditionId, condition } = conditionMeta(item.condition);
-  const categoryId = defaultCategoryId(item);
-  const quantity = item.quantity > 0 ? item.quantity : 1;
-  const images = absoluteImageUrls(item);
+  const source = item.category === "vehicles" ? rewriteVehicleEbayDescription(item) : item;
+  const title = (source.ebayTitle || source.name || "").slice(0, 80);
+  const { conditionId, condition } = conditionMeta(source.condition);
+  const categoryId = defaultCategoryId(source);
+  const quantity = source.quantity > 0 ? source.quantity : 1;
+  const images = absoluteImageUrls(source);
 
-  const description = [
-    item.description || "",
-    "",
-    "Sold by Prince George Transport — licensed SC ambulance service (NPI 1922468909).",
-    "Pickup available in Blythewood, SC. Call (803) 231-9420 with questions.",
-    "",
-    `${SITE_URL}/supplies.html`,
-  ]
+  const footer =
+    source.category === "vehicles"
+      ? [
+          "Sold by Prince George Transport — licensed SC ambulance service (NPI 1922468909).",
+          "Payment through eBay checkout only — no cash or at-site payment.",
+          "Local pickup in Blythewood, SC after payment clears, or buyer-arranged transport.",
+          `${SITE_URL}/supplies.html`,
+        ]
+      : [
+          "Sold by Prince George Transport — licensed SC ambulance service (NPI 1922468909).",
+          "Pickup available in Blythewood, SC. Call (803) 231-9420 with questions.",
+          `${SITE_URL}/supplies.html`,
+        ];
+
+  const description = [source.description || "", "", ...footer]
     .filter((l, i, arr) => !(l === "" && arr[i - 1] === ""))
     .join("\n");
 
@@ -49,16 +58,17 @@ export function buildEbayDraft(item) {
   });
 
   return {
-    id: item.id,
+    id: source.id,
     title,
-    price: item.price,
+    price: source.price,
     quantity,
     condition,
     conditionId,
-    brand: item.brand || (item.category === "radios" ? "Motorola" : "Unbranded"),
+    brand: source.brand || (source.category === "radios" ? "Motorola" : source.category === "vehicles" ? "Ford" : "Unbranded"),
     description,
     images,
     categoryId,
+    acceptOffers: Boolean(source.acceptOffers),
     prelistUrl: "https://www.ebay.com/sl/prelist/suggest",
     listUrl: `https://www.ebay.com/sl/list?${params.toString()}`,
   };
@@ -66,8 +76,7 @@ export function buildEbayDraft(item) {
 
 export function buildEbayDraftQueue(items) {
   return (items || [])
-    .filter((item) => item && item.category !== "vehicles")
-    .filter((item) => item.price != null && Number(item.price) > 0)
+    .filter((item) => item && item.price != null && Number(item.price) > 0)
     .filter((item) => !item.ebayListingUrl)
     .filter((item) => !isRestrictedItem(item))
     .map(buildEbayDraft);

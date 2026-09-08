@@ -4,6 +4,7 @@ import {
   applyInventoryPolicyTweaks,
   filterSellableItems,
 } from "./sales-policy.js";
+import { applyVehicleEbayPaymentCopy } from "./vehicle-ebay-copy.js";
 
 export const INVENTORY_KEY = "inventory:v1";
 export const SALES_POLICY_PURGE_KEY = "inventory:sales-policy-purge:v1";
@@ -149,7 +150,7 @@ export async function getInventory(env, { applyPolicy = true } = {}) {
 
   if (!applyPolicy) return items;
 
-  const tweaked = applyInventoryPolicyTweaks(items);
+  const tweaked = applyVehicleEbayPaymentCopy(applyInventoryPolicyTweaks(items));
   const { sellable, removed } = filterSellableItems(tweaked);
 
   const before = JSON.stringify(items);
@@ -174,7 +175,7 @@ export async function saveInventory(env, items, { applyPolicy = true } = {}) {
   if (!env.INVENTORY) throw new Error("Inventory storage not configured");
   let list = (items || []).map(normalizeItem).filter(Boolean);
   if (applyPolicy) {
-    list = applyInventoryPolicyTweaks(list);
+    list = applyVehicleEbayPaymentCopy(applyInventoryPolicyTweaks(list));
     const { sellable, removed } = filterSellableItems(list);
     if (removed.length) {
       await env.INVENTORY.put(
@@ -205,6 +206,11 @@ export function normalizeItem(item) {
   const extraImageUrls = Array.isArray(item.extraImageUrls)
     ? item.extraImageUrls.map((u) => String(u || "").trim()).filter(Boolean)
     : [];
+  const mileageRaw = item.mileage;
+  const mileage =
+    mileageRaw === "" || mileageRaw === null || mileageRaw === undefined
+      ? null
+      : Number(mileageRaw);
 
   return {
     id: item.id || slugify(name),
@@ -223,6 +229,9 @@ export function normalizeItem(item) {
     ebayListingUrl: String(item.ebayListingUrl || "").trim(),
     ebayQueued: Boolean(item.ebayQueued),
     captureId: String(item.captureId || "").trim(),
+    mileage: Number.isFinite(mileage) && mileage >= 0 ? mileage : null,
+    engineNotes: String(item.engineNotes || "").trim(),
+    acceptOffers: item.acceptOffers === false ? false : Boolean(item.acceptOffers ?? item.category === "vehicles"),
     updatedAt: new Date().toISOString(),
   };
 }
