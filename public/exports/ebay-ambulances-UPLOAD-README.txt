@@ -1,17 +1,18 @@
-Upload these 5 ambulances to eBay (FIXED after failed upload)
+PaymentMethods error fix
 
-File: ebay-ambulances-create-listings.csv / .zip
+Your eBay account uses Business Policies, so PaymentMethods is REJECTED.
 
-Fixes applied from eBay error report:
-1. Removed ConditionID / Condition Description (too long + not valid for this category)
-2. Category changed to leaf 63735 = Emergency & Fire Trucks
-3. Added PaymentMethods (PayPal,VisaMC,AmEx,Discover) for the offline-payments error
+Two options:
 
-If upload still fails on Business Policies, open the CSV and fill these
-with the EXACT names from Seller Hub → Account → Business policies:
-  PaymentProfileName
-  ShippingProfileName
-  ReturnProfileName
+A) PREFERRED — use the AI prefill file (no PaymentMethods):
+   ebay-ambulances-prefill-listing.xlsx / .zip
+   Upload at Seller Hub → Uploads
 
-Then upload at https://www.ebay.com/sh/reports/uploads
-Template type: Create new listings
+B) Create-listings file — fill policy names first:
+   1. Open https://www.ebay.com/bpp/page/businesspolicy
+   2. Copy exact Payment / Shipping / Return policy names
+   3. Put them in PaymentProfileName, ShippingProfileName, ReturnProfileName
+      on every row (or in the SETUP sheet of the xlsx, then copy across)
+   4. Upload CSV/XLSX as Create new listings
+
+PaymentMethods column has been REMOVED from the create-listings file.
