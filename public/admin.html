@@ -129,14 +129,17 @@
               <button type="button" class="btn btn-primary" id="ebay-connect" hidden>Connect eBay Account</button>
               <button type="button" class="btn btn-primary" id="ebay-publish-all" hidden>Publish All to eBay</button>
               <button type="button" class="btn btn-primary" id="ebay-publish-radios" hidden>Publish Radios to eBay</button>
+              <a href="/exports/ebay-ambulances-create-listings.csv" class="btn btn-primary" id="ebay-ambulance-upload-csv" download="ebay-ambulances-create-listings.csv">Download Ambulance eBay Upload CSV</a>
               <a href="/api/admin/ebay-export" class="btn btn-outline" id="ebay-csv-download">Download Listing Worksheet CSV</a>
+              <a href="https://www.ebay.com/sh/reports/uploads" class="btn btn-outline" id="ebay-uploads" target="_blank" rel="noopener">Open eBay Uploads →</a>
               <a href="https://www.ebay.com/sh/lst/active" class="btn btn-primary" id="ebay-seller-hub" target="_blank" rel="noopener">Open Seller Hub →</a>
               <button type="button" class="btn btn-outline" id="ebay-disconnect" hidden>Disconnect</button>
             </div>
             <p class="admin-muted" style="margin-top:0.75rem;font-size:0.8rem" id="ebay-help-text">
-              <strong>No Developer API needed:</strong> use the Form Filler below (or CSV worksheet) in
-              <a href="https://www.ebay.com/sl/prelist/suggest" target="_blank" rel="noopener">Seller Hub</a>.
-              Auto-publish buttons appear only if eBay later approves a Developer account — see <code>SETUP-EBAY.md</code>.
+              <strong>Ambulance upload CSV:</strong> five trucks at $1500 for Seller Hub → Uploads → Create new listings.
+              Fill Business Policy name columns if eBay requires them.
+              <strong>Worksheet CSV</strong> is for manual listing notes, not eBay’s bulk template.
+              Form Filler below still works for one-off listings — see <code>SETUP-EBAY.md</code>.
             </p>
             <div id="ebay-results" class="admin-fb-list"></div>
           </div>
