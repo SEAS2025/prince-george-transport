@@ -1,19 +1,15 @@
-Facebook Marketplace bulk upload — 5 ambulances
+Facebook Marketplace bulk upload — FIXED
 
-Files:
-- facebook-ambulances-marketplace-bulk-UPLOAD.xlsx  ← use this for upload
-- facebook-ambulances-marketplace-bulk.xlsx         ← same listings + compliance notes sheet
+Upload: facebook-ambulances-marketplace-bulk-UPLOAD.xlsx
 
-Compliance choices baked into the listings:
-- Condition: Used - Fair
-- Clearly discloses DOES NOT RUN / not roadworthy / as-is
-- Salvage title + VIN + mileage disclosed
-- $1500 real price (no $1 bait)
-- No medical equipment / healthcare products offered
-- Seller named; Blythewood SC local pickup only
-- Category blank (this official bulk template has no Vehicles category)
+What was wrong before:
+1. Condition was "Used - Fair" (regular hyphen, title case).
+   Template dropdown requires exactly: 'Used – fair'
+2. Category was blank. Spreadsheet validation requires a category from the list.
+   Now set to: Auto Parts & Accessories//Car Parts & Accessories
 
-Photos: use facebook-ambulances-listing-pack.zip (original truck photos).
-This XLSX template has no photo columns.
-
-Official policies: https://www.facebook.com/policies/commerce
+Also:
+- Titles under 150 chars
+- Descriptions under 5000 chars, ASCII only
+- Price 1500 whole number
+- Clear does-not-run / salvage / no medical gear disclosures
